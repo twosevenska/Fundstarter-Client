@@ -11,12 +11,13 @@ public class tcpClient {
 	 	 * 2. Refactor this and remove the test sections
 		*/
 		Socket objsock = null;
-		int serversocket = 7000;
+		int serversocket = 6000;
 		
 		try {
 			// First open the socket
-			objsock = new Socket("Java TCP Client", serversocket);
+			objsock = new Socket("localhost", serversocket);
 			// For debugging purposes
+			
 			System.out.println("SOCKET=" + objsock);
 			
 			// Now open object streams
@@ -27,10 +28,8 @@ public class tcpClient {
 			oos.writeObject(userpassobj);
 			// Better clean the socket
 			oos.flush();
-		} catch (UnknownHostException e){
-		    System.out.println("Sock:" + e.getMessage());
-		} catch (IOException e) {
-		    System.out.println("IO:" + e.getMessage());
+		} catch (UnknownHostException e){System.out.println("Sock:" + e.getMessage());
+		} catch (IOException e) {System.out.println("IO:" + e.getMessage());
 		} finally{
 			if (objsock != null)
 				try {

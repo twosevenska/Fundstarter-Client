@@ -12,7 +12,7 @@ public class Main {
 		 * 4. Make it work on a thread
 		*/
 		System.out.println("He-hey man!");
-		System.out.println("You're a cool guy so let me login you in ;)");
+		System.out.println("You're a cool guy so let me log you in ;)");
 		// So let's run the test
 		tcpClient.createTcpSocket();
 	}
