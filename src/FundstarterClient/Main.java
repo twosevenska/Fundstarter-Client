@@ -1,6 +1,7 @@
 package FundstarterClient;
 
 import FundstarterClient.tcpClient;
+import FundstarterClient.menuNavigation;
 
 public class Main {
 
@@ -11,10 +12,10 @@ public class Main {
 		 * 3. Creates the object and sends it
 		 * 4. Make it work on a thread
 		*/
-		System.out.println("He-hey man!");
-		System.out.println("You're a cool guy so let me log you in ;)");
+		menuNavigation.splashScreen();
+		menuNavigation.mainMenu();
 		// So let's run the test
-		tcpClient.createTcpSocket();
+		//tcpClient.createTcpSocket();
 	}
 
 }
