@@ -15,14 +15,14 @@ public class inputCheck {
 			String readval = sc.nextLine();
 			if(Arrays.asList(valStr).contains(readval)){
 				valid = true;
-				sc.close();
+				////sc.close();
 				return Integer.parseInt(readval);
 			}else{
 				System.out.println("Invalid input: " + readval);
 				System.out.println("Please try again.");
 			}
 		}
-		sc.close();
+		////sc.close();
 		return 0;
 	}
 	
@@ -40,7 +40,7 @@ public class inputCheck {
 				System.out.println("Please try again.");
 			}
 		}
-		sc.close();
+		////sc.close();
 		return readval;
 	}
 	
@@ -49,7 +49,7 @@ public class inputCheck {
 		
 		Scanner sc = new Scanner(System.in);
 		readval = sc.nextLine();
-		sc.close();
+		////sc.close();
 		return readval;
 	}
 	
@@ -75,7 +75,7 @@ public class inputCheck {
 				System.out.println("Please try again.");
 			}
 		}
-		sc.close();
+		////sc.close();
 		readVal = readYear + '-' + readMonth + '-' + readDay;
 		return readVal;
 	}
@@ -113,7 +113,7 @@ public class inputCheck {
 				System.out.println("Please try again.");
 			}
 		}
-		sc.close();
+		//sc.close();
 		return readval;
 	}
 	
@@ -158,7 +158,7 @@ public class inputCheck {
 			menuNavigation.createTier(project);
 			counter++;
 		}
-		sc.close();
+		//sc.close();
 	}
 	
 	public static boolean areYouSure(){

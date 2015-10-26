@@ -39,7 +39,7 @@ public class menuNavigation {
 	private static void loginCheck(){
 		String user;
 		String pass;
-		if(!logged){
+		if(logged){
 			System.out.println("Username: ");
 			user = inputCheck.getGeneralString();
 			System.out.println("Password: ");
@@ -144,7 +144,7 @@ public class menuNavigation {
 		int answer;
 		int i;
 		
-		System.out.println("Do you wish to only see Active Projects?)");
+		System.out.println("Do you wish to only see Active Projects?");
 		System.out.println("Choose an option:");
 		System.out.println("\t1. Yes");
 		System.out.println("\t2. No");
@@ -357,7 +357,7 @@ public class menuNavigation {
 		ansArr2[0] = "2";
 		System.out.println("\t0. Main menu");
 		System.out.println("\t1. Previous menu");
-		System.out.println("\t2. Create ");
+		System.out.println("\t2. Create ");// logged?
 		for(i = 3; i<notList.length;i++){
 			System.out.println("\t"+i+". Title - "+notList[i][1]);
 			ansArr2[i] = ""+i;
@@ -378,7 +378,7 @@ public class menuNavigation {
 		String description = null;
 		String notAnswer = null;
 		
-		//function to get a notification
+		//function to get a notification title, description and user
 		//function to verify if it is answered
 		//function to verify if admin
 		
