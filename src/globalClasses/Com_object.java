@@ -38,45 +38,6 @@ public class Com_object implements Serializable{
 		remove_meta
 	}
 	
-	public String server_call_operation()
-	{
-		/*RMI functions on every case*/
-		switch(op)
-		{
-		case see_all_proj_off:
-			break;
-		case see_all_proj_on:
-			break;
-		case see_proj_responses:
-			break;
-		case login:
-			break;
-		case register:
-			break;
-		case create_proj:
-			break;
-		case see_proj_my:
-			break;
-		case check_query:
-			break;
-		case pledge_project:
-			break;
-		case see_pledges:
-			break;
-		case see_reward:
-			break;
-		case cancel_project:
-			break;
-		case check_metas:
-			break;
-		case add_meta:
-			break;
-		case remove_meta:
-			break;
-		}
-		return "CHECK THE TYPE OF PACKAGE!";
-	}
-	
 	public long generateIdPackage(int id)//generate id for the request
 	{
 		return Long.parseLong(Integer.toString(id) + Long.toString(System.currentTimeMillis()/1000));

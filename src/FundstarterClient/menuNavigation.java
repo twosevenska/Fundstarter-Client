@@ -50,7 +50,7 @@ public class menuNavigation {
 			pass = inputCheck.getGeneralString();
 			userId = tcpClient.loginUser(user, pass);
 			if(userId != 0)
-				logged = true;
+				logged = false;
 			if(verbose)
 				System.out.println("TEST@loginCheck: UserID = " + userId);
 		}else{

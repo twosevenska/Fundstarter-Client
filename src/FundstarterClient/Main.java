@@ -11,6 +11,9 @@ public class Main {
 		 * 3. Creates the object and sends it
 		 * 4. Make it work on a thread
 		*/
+		
+		tcpClient.createTcpSocket();
+		
 		while(true){
 			menuNavigation.splashScreen();
 			menuNavigation.mainMenu();

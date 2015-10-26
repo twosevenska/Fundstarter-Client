@@ -11,44 +11,54 @@ import globalClasses.Com_object.operationtype;
 public class tcpClient {
 	
 	static boolean verbose = true;
+	static Socket objsock = null;
+	static ObjectOutputStream oos;
+	static ObjectInputStream ois;
 	
-	private static Com_object createTcpSocket(int userId, operationtype operation, Hashtable<String, String> content) {
-		Socket objsock = null;
+	public static void createTcpSocket() {
+		
 		int serversocket = 6000;
 		
 		try {
 			// First open the socket
 			objsock = new Socket("localhost", serversocket);
-			// For debugging purposes
-			
-			System.out.println("SOCKET=" + objsock);
+			if(verbose)
+				System.out.println("SOCKET=" + objsock);
 			
 			// Now open the object streams
-			ObjectOutputStream oos = new ObjectOutputStream(objsock.getOutputStream());
-			ObjectInputStream ois = new ObjectInputStream(objsock.getInputStream());
-			// Let's create the object
-			Com_object comOut = new Com_object(userId, operation, content);
-			// And now send it
+			oos = new ObjectOutputStream(objsock.getOutputStream());
+			ois = new ObjectInputStream(objsock.getInputStream());
+		} catch (UnknownHostException e){System.out.println("Sock:" + e.getMessage());
+		} catch (IOException e) {System.out.println("IO:" + e.getMessage());
+		} 
+	}
+	
+	public static void closeTcpSocket(){
+		if (objsock != null)
+			try {
+				objsock.close();
+			} catch (IOException e) {
+			    System.out.println("close:" + e.getMessage());
+			}
+	}
+	
+	private static Com_object sendThroughSocket(int userId, operationtype operation, Hashtable<String, String> content){
+		Com_object comIn = null;
+		// Let's create the object
+		Com_object comOut = new Com_object(userId, operation, content);
+		// And now send it
+		try{
 			oos.writeObject(comOut);
 			// Better clean the socket
 			oos.flush();
 			// And now read
-			Com_object comIn = (Com_object) ois.readObject();
-			return comIn;
-		} catch (UnknownHostException e){System.out.println("Sock:" + e.getMessage());
+			comIn = (Com_object) ois.readObject();
 		} catch (IOException e) {System.out.println("IO:" + e.getMessage());
 		} catch (ClassNotFoundException e) {System.out.println("Wrong Object:" + e.getMessage());
-		} finally{
-			if (objsock != null)
-				try {
-					objsock.close();
-				} catch (IOException e) {
-				    System.out.println("close:" + e.getMessage());
-				}
 		}
-		return null;
+		
+		return comIn;
 	}
-	
 	
 	public static int loginUser(String username, String password){
 		int userId = 0; 
@@ -62,7 +72,7 @@ public class tcpClient {
 			System.out.println(loginData);
 			System.out.println("TEST@loginUser: Sending everything now.");
 		}
-		Com_object comIn = createTcpSocket(userId, operationtype.login, loginData);
+		Com_object comIn = sendThroughSocket(userId, operationtype.login, loginData);
 		
 		if(verbose)
 			System.out.println("TEST@loginUser: Now getting userID");
