@@ -1,10 +1,14 @@
 package FundstarterClient;
 
+import java.util.ArrayList;
+
 import FundstarterClient.inputCheck;
 
 public class menuNavigation {
 	
 	static boolean logged = false;
+	static int userId = 0;
+	static boolean verbose = true;
 	
 	public static void splashScreen() {
 		System.out.println("    ______                __     __             __           ");
@@ -39,12 +43,16 @@ public class menuNavigation {
 	private static void loginCheck(){
 		String user;
 		String pass;
-		if(logged){
+		if(!logged){
 			System.out.println("Username: ");
 			user = inputCheck.getGeneralString();
 			System.out.println("Password: ");
 			pass = inputCheck.getGeneralString();
-			// Call function to check if user can be logged
+			userId = tcpClient.loginUser(user, pass);
+			if(userId != 0)
+				logged = true;
+			if(verbose)
+				System.out.println("TEST@loginCheck: UserID = " + userId);
 		}else{
 			loginMenu();
 		}
@@ -137,12 +145,13 @@ public class menuNavigation {
 	}
 	
 	public static void showProjectsMenu(boolean owned){
+		//Adapt this function to get part of the menu from the server
 		boolean oldFlag = false;
 		String[] ansArr = {"1","2"};
 		String[] ansArr2 = new String[1000];
-		String[][] projList = null;
+		ArrayList projList = new ArrayList();
 		int answer;
-		int i;
+		int i = 1;
 		
 		System.out.println("Do you wish to only see Active Projects?");
 		System.out.println("Choose an option:");
@@ -158,17 +167,19 @@ public class menuNavigation {
 				break;
 		}
 		
-		//Call function to get an object with a project name and id
-		System.out.println("Choose an option:");
+		//Call function to get an object with a project names and ids
+		/*System.out.println("Choose an option:");
 		ansArr2[0] = "0";
 		System.out.println("\t0. Main menu");
-		for(i = 1; i<projList.length;i++){
-			System.out.println("\t"+i+". Project - "+projList[i][1]);
+		for(Object t: projList){
+			if()
+			System.out.println("\t"+i+". Project - "+t[i][1]);
 			ansArr2[i] = ""+i;
+			i++;
 		}
 		answer = inputCheck.getMenuAnswer(ansArr2);
 		if(answer > 0 && answer <= i)
-			showProjectOptionMenu(projList[answer][0]);
+			showProjectOptionMenu(projList[answer][0]);*/
 	}
 	
 	public static void showProjectOptionMenu(String projID){
@@ -233,6 +244,7 @@ public class menuNavigation {
 	}
 	
 	public static void listRewardsMenu(String projID){
+		//Adapt this for server side list
 		boolean admin = false;
 		String[] ansArr2 = new String[1000];
 		String[][] rewList = null;
@@ -344,6 +356,7 @@ public class menuNavigation {
 	}
 	
 	public static void listNotificationsMenu(String projID){
+		//Adapt this for server side list
 		boolean admin = false;
 		String[][] notList = null;
 		String[] ansArr2 = new String[1000];

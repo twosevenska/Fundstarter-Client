@@ -1,6 +1,5 @@
 package FundstarterClient;
 
-import FundstarterClient.tcpClient;
 import FundstarterClient.menuNavigation;
 
 public class Main {

@@ -1,11 +1,16 @@
 package globalClasses;
 
+import java.io.Serializable;
 import java.util.Hashtable;
 
-public class Com_object {
+public class Com_object implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	long idpackage;//package id, to avoid repeated packages
 	operationtype op;//type of operation
-	Hashtable<String, String> elements;//elements of the package
+	public Hashtable<String, String> elements;//elements of the package
     
 	public Com_object(int id, operationtype ope,Hashtable<String, String> ele)
 	{

@@ -106,7 +106,7 @@ public class inputCheck {
 		Scanner sc = new Scanner(System.in);
 		while(!valid){
 			readval = sc.nextLine();
-			if(checkPositiveInt(readval)){
+			if(checkIfInt(readval) && Integer.parseInt(readval) > 0){
 				valid = true;
 			}else{
 				System.out.println("Sorry but the ammount " + readval + " is not valid.");
@@ -117,19 +117,13 @@ public class inputCheck {
 		return readval;
 	}
 	
-	private static boolean checkPositiveInt(String str){
-		int temp;
-		try { 
-	        temp = Integer.parseInt(str);
-	    } catch(NumberFormatException e) { 
-	        return false; 
-	    } catch(NullPointerException e) {
-	        return false;
-	    }
+	private static boolean checkIfInt(String str){
+		int radix = 10;
+		Scanner sc = new Scanner(str.trim());
 		
-		if(temp > 0)
-			return true;
-		return false;
+		if(!sc.hasNextInt(radix)) return false;
+		sc.nextInt(radix);
+		return !sc.hasNext();
 	}
 	
 	public static void createTierMenu(int totalTiers, String project){
@@ -143,7 +137,7 @@ public class inputCheck {
 			System.out.println("For starters how many tiers do you wish to create for now? You can add/remove tiers later on.");
 			while(!valid){
 				readval = sc.nextLine();
-				if(checkPositiveInt(readval)){
+				if(checkIfInt(readval) && Integer.parseInt(readval) > 0){
 					valid = true;
 					totalTiers = Integer.parseInt(readval);
 				}else{
