@@ -116,4 +116,26 @@ public class tcpClient {
 		return false;
 	}
 	
+	
+	public static String checkWallet(int userId){
+		String walletAmmount = null;
+		Hashtable<String, String> identification = new Hashtable<String, String>();
+		
+		identification.put("userId", Integer.toString(userId));
+		
+		if(verbose)
+			System.out.println("TEST@getWallet: Sending everything now.");
+		
+		Com_object comIn = sendThroughSocket(userId, operationtype.check_wallet, identification);
+		
+		if(verbose)
+			System.out.println("TEST@getWallet: Now getting wallet ammount");
+		
+		walletAmmount = comIn.elements.get("wallet");
+		
+		if(verbose)
+			System.out.println("TEST@getWallet: Got walletAmmount = "+ walletAmmount);
+		
+		return walletAmmount;
+	}
 }

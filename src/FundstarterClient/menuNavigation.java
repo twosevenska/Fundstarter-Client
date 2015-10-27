@@ -50,7 +50,7 @@ public class menuNavigation {
 			pass = inputCheck.getGeneralString();
 			userId = tcpClient.loginUser(user, pass);
 			if(userId != 0)
-				logged = false;
+				logged = true;
 			if(verbose)
 				System.out.println("TEST@loginCheck: UserID = " + userId);
 		}else{
@@ -78,7 +78,7 @@ public class menuNavigation {
 	}
 	
 	private static void loginMenu(){
-		int wallet = 100; //Replace this so that it gets the wallet value from the server
+		String wallet = tcpClient.checkWallet(userId); //Replace this so that it gets the wallet value from the server
 		System.out.println("Wallet: " + wallet);
 		System.out.println("Choose an option:");
 		System.out.println("\t0. Main menu");

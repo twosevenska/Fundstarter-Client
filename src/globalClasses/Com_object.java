@@ -35,7 +35,8 @@ public class Com_object implements Serializable{
 		cancel_project,
 		check_metas,
 		add_meta,
-		remove_meta
+		remove_meta,
+		check_wallet
 	}
 	
 	public long generateIdPackage(int id)//generate id for the request
