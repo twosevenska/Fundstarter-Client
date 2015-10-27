@@ -61,12 +61,18 @@ public class menuNavigation {
 	private static void registerCheck(){
 		String user;
 		String pass;
+		boolean status = false;
 		if(!logged){
 			System.out.println("Username: ");
 			user = inputCheck.getGeneralString();
 			System.out.println("Password: ");
 			pass = inputCheck.getGeneralString();
-			// Call function to check if user can be registered
+			status = tcpClient.registerUser(user, pass);
+			if(status){
+				System.out.println("Thanks for registering! You can now login.");
+			}else{
+				System.out.println("Sorry, but we couldn't register you. Please try another Username.");
+			}
 		}
 		
 	}

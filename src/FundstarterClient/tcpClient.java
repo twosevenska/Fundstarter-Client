@@ -61,7 +61,7 @@ public class tcpClient {
 	}
 	
 	public static int loginUser(String username, String password){
-		int userId = 0; 
+		int userId = 0;
 		Hashtable<String, String> loginData = new Hashtable<String, String>();
 		
 		loginData.put("username", username);
@@ -85,6 +85,35 @@ public class tcpClient {
 		return userId;
 	}
 	
-	
+	public static boolean registerUser(String username, String password){
+		int userId = 0;
+		int iStatus;
+		Hashtable<String, String> loginData = new Hashtable<String, String>();
+		
+		loginData.put("username", username);
+		loginData.put("password", password);
+		
+		if(verbose){
+			System.out.println("TEST@registerUser: Sending hash = " );
+			System.out.println(loginData);
+			System.out.println("TEST@registerUser: Sending everything now.");
+		}
+		Com_object comIn = sendThroughSocket(userId, operationtype.register, loginData);
+		
+		if(verbose){
+			System.out.println("TEST@registerUser: Now getting success status");
+			System.out.println("TEST@registerUser: Got the hastable: " + comIn.elements);
+		}
+		
+		String status = comIn.elements.get("status");
+		iStatus = Integer.parseInt(status);
+		
+		if(verbose)
+			System.out.println("TEST@registerUser: Got iStatus = "+ iStatus);
+		
+		if(iStatus == 0)
+			return true;
+		return false;
+	}
 	
 }

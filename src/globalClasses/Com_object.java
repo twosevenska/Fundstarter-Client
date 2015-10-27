@@ -9,7 +9,7 @@ public class Com_object implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 	long idpackage;//package id, to avoid repeated packages
-	operationtype op;//type of operation
+	public operationtype op;//type of operation
 	public Hashtable<String, String> elements;//elements of the package
     
 	public Com_object(int id, operationtype ope,Hashtable<String, String> ele)
