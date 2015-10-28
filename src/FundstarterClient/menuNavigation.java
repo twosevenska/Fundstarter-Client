@@ -1,6 +1,7 @@
 package FundstarterClient;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 import FundstarterClient.inputCheck;
 
@@ -103,9 +104,17 @@ public class menuNavigation {
 	
 	private static void addWalletMoney(){
 		String walletDOSH = "0";
+		boolean answer = false;
 		System.out.println("How much do you wish to add? ");
 		walletDOSH = inputCheck.getMoney();
-		//Call function to add money on server
+		answer = tcpClient.addMoneyWallet(userId, walletDOSH);
+		if (answer){
+			System.out.println("Your wallet has been updated. Capitalism, ho!");
+		}else{
+			System.out.println("Sorry but we couldn't add the money right now.");
+			System.out.println("Please try again later.");
+		}
+			
 	}
 	
 	private static void createProjectMenu(){
@@ -113,6 +122,7 @@ public class menuNavigation {
 		String descri;
 		String endDate;
 		String reqAmmount;
+		boolean status = false;
 		
 		System.out.println("Hi! We're very happy that you chose Fundstarter to host your crowdsourcing idea!");
 		System.out.println("But let's not get ahead of ourselves, for starters what's the name of your project?");
@@ -129,10 +139,15 @@ public class menuNavigation {
 		System.out.println("We're still missing how much money you need:");
 		reqAmmount = inputCheck.getMoney();
 		
-		//Call function to create project entry in database without the tiers
+		status = tcpClient.createProject(userId, projName, descri, endDate, reqAmmount);
 		
-		System.out.println("Awesome, you're almost finished, now you'll just need to go over your tiers and rewards for the project.");
-		inputCheck.createTierMenu(2, projName);
+		if(status){
+			System.out.println("Awesome, you're almost finished, now you'll just need to go over your tiers and rewards for the project.");
+			inputCheck.createTierMenu(2, projName);
+		}else{
+			System.out.println("Sorry but we couldn't create the Project right now.");
+			System.out.println("Please try again later.");
+		}
 		
 	}
 	
@@ -140,6 +155,7 @@ public class menuNavigation {
 	public static void createTier(String project){
 		String descri;
 		String reqAmmount;
+		boolean status = false;
 		
 		System.out.println("What's the reward?");
 		descri = inputCheck.getGeneralString();
@@ -147,17 +163,25 @@ public class menuNavigation {
 		System.out.println("What's the minimum ammount required for this tier?");
 		reqAmmount = inputCheck.getMoney();
 		
-		//Call function to add tier entry to the project in the database
+		status = tcpClient.createTier(userId, descri, reqAmmount);
+		
+		if(status){
+			System.out.println("Tier accepted :)");
+		}else{
+			System.out.println("Sorry but we couldn't create this tier right now.");
+			System.out.println("Please try again later.");
+		}
 	}
 	
 	public static void showProjectsMenu(boolean owned){
 		//Adapt this function to get part of the menu from the server
-		boolean oldFlag = false;
+		//Almost there, you forgot the project id... Best solution, create a custom object with two String[]
+		/*boolean oldFlag = false;
 		String[] ansArr = {"1","2"};
-		String[] ansArr2 = new String[1000];
-		ArrayList projList = new ArrayList();
+		String[] projListArray;
+		String[] projListAnswer;
+		int projListSize;
 		int answer;
-		int i = 1;
 		
 		System.out.println("Do you wish to only see Active Projects?");
 		System.out.println("Choose an option:");
@@ -173,6 +197,18 @@ public class menuNavigation {
 				break;
 		}
 		
+		
+		projListArray = tcpClient.getProjectsList(oldFlag);
+		projListSize = projListArray.length();
+		projListAnswer = createAnswerList(projListSize);
+		
+		for(String str : projListArray)
+			System.out.println(str);
+		
+		answer = inputCheck.getMenuAnswer(projListAnswer);
+		if(answer > 0 && answer < projListSize)
+			showProjectOptionMenu(projList[answer][0]);
+		
 		//Call function to get an object with a project names and ids
 		/*System.out.println("Choose an option:");
 		ansArr2[0] = "0";
@@ -186,6 +222,16 @@ public class menuNavigation {
 		answer = inputCheck.getMenuAnswer(ansArr2);
 		if(answer > 0 && answer <= i)
 			showProjectOptionMenu(projList[answer][0]);*/
+	}
+	
+	private static String[] createAnswerList(int size){
+		String[] answerList = new String[size];
+		
+		for(int i = 0; i<size; i++){
+			answerList[i] = Integer.toString(i);
+		}
+		
+		return answerList;
 	}
 	
 	public static void showProjectOptionMenu(String projID){

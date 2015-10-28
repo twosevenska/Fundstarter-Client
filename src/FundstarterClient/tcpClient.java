@@ -138,4 +138,85 @@ public class tcpClient {
 		
 		return walletAmmount;
 	}
+	
+	public static boolean addMoneyWallet(int userId, String money){
+		int mStatus;
+		Hashtable<String, String> moneyHash = new Hashtable<String, String>();
+		
+		moneyHash.put("userId", Integer.toString(userId));
+		moneyHash.put("userId", money);
+		
+		if(verbose)
+			System.out.println("TEST@addMoneyWallet: Sending everything now.");
+		
+		Com_object comIn = sendThroughSocket(userId, operationtype.add_wallet, moneyHash);
+		
+		if(verbose)
+			System.out.println("TEST@addMoneyWallet: Now getting wallet update confirmation");
+		
+		mStatus = Integer.parseInt(comIn.elements.get("money"));
+		
+		if(verbose)
+			System.out.println("TEST@addMoneyWallet: Got mStatus = "+ mStatus);
+		
+		if(mStatus == 0)
+			return true;
+		return false;
+	}
+	
+	public static boolean createProject(int userId, String projName, String description,
+										String endDate, String reqAmmount){
+		int status = 0;
+		Hashtable<String, String> projectHash = new Hashtable<String, String>();
+		
+		projectHash.put("userId", Integer.toString(userId));
+		projectHash.put("projName", projName);
+		projectHash.put("description", description);
+		projectHash.put("endDate", endDate);
+		projectHash.put("reqAmmount", reqAmmount);
+		
+		if(verbose)
+			System.out.println("TEST@createProject: Sending everything now.");
+		
+		Com_object comIn = sendThroughSocket(userId, operationtype.create_proj, projectHash);
+		
+		if(verbose)
+			System.out.println("TEST@createProject: Now getting project creation confirmation");
+		
+		status = Integer.parseInt(comIn.elements.get("projectStatus"));
+		
+		if(verbose)
+			System.out.println("TEST@createProject: Got status = "+ status);
+		
+		if(status == 0)
+			return true;
+		return false;
+	}
+	
+	public static boolean createTier(int userId, String description, String reqAmmount){
+		int status = 0;
+		Hashtable<String, String> tierHash = new Hashtable<String, String>();
+		
+		tierHash.put("userId", Integer.toString(userId));
+		tierHash.put("description", description);
+		tierHash.put("reqAmmount", reqAmmount);
+		
+		if(verbose)
+		System.out.println("TEST@createTier: Sending everything now.");
+		
+		Com_object comIn = sendThroughSocket(userId, operationtype.add_meta, tierHash);
+		
+		if(verbose)
+		System.out.println("TEST@createTier: Now getting tier creation confirmation");
+		
+		status = Integer.parseInt(comIn.elements.get("tierStatus"));
+		
+		if(verbose)
+		System.out.println("TEST@createTier: Got status = "+ status);
+		
+		if(status == 0)
+			return true;
+		return false;
+	}
+	
 }
