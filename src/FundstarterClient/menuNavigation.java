@@ -230,32 +230,32 @@ public class menuNavigation {
 		String progress = null;
 		String description = null;
 		String endDate = null;
+		int answer;
+		Hashtable<String, String> projectInfo;
 		
-		//Call function to get all info from project
-		//Call function to check if active
+		projectInfo = tcpClient.getProjectData(userId, projID);
+		
+		if(projectInfo.get("active") != "0")
+			active = false;
 		
 		if(active){
-			/*
-			 * title = ;
-			 * progress = ;
-			 * description = ;
-			 * endDate = ;
-			 */
+			title = projectInfo.get("title");
+			progress = projectInfo.get("progress");
+			description = projectInfo.get("description");
+			endDate = projectInfo.get("endDate");
 			System.out.println("Project - " + title);
 			System.out.println("Status: " + progress + "\tCloses on: " + endDate);
 			System.out.println("Description: - " + description);
 		}else{
-			/*
-			 * title = ;
-			 * progress = ;
-			 * description = ;
-			 */
+			title = projectInfo.get("title");
+			progress = projectInfo.get("progress");
+			description = projectInfo.get("description");
 			System.out.println("Project - " + title);
 			System.out.println("Status: " + progress);
 			System.out.println("Description: - " + description);
 		}
 		
-		//Call function to check if admin
+		admin = tcpClient.checkAdmin(userId);
 
 		System.out.println("Choose an option:");
 		System.out.println("\t0. Main menu");
@@ -264,10 +264,11 @@ public class menuNavigation {
 		if(admin && !active){
 			System.out.println("\t3. Cancel Project");
 			String[] ansArr = {"1","2","3","0"};
+			answer = inputCheck.getMenuAnswer(ansArr);
+		}else{
+			String[] ansArr = {"1","2","0"};
+			answer = inputCheck.getMenuAnswer(ansArr);
 		}
-		String[] ansArr = {"1","2","0"};
-		
-		int answer = inputCheck.getMenuAnswer(ansArr);
 		
 		switch (answer){
 			case 0: break;
@@ -276,8 +277,8 @@ public class menuNavigation {
 			case 2:	listNotificationsMenu(projID);
 					break;
 			case 3:	boolean nuke = inputCheck.areYouSure();
-					//if(nuke)
-						//Call function to delete project
+					if(nuke)
+						tcpClient.nukeProject(userId, projID);
 					break;
 			default:System.out.println("Err: User Panel Menu - Switch case not found for " + answer);
 					break;

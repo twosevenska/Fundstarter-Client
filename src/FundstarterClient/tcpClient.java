@@ -297,4 +297,73 @@ public class tcpClient {
 		
 		return result;
 	}
+	
+	public static Hashtable< String, String> getProjectData(int userId, String projID){
+		Hashtable<String, String> requestHash = new Hashtable<String, String>();
+		Hashtable<String, String> answerHash;
+		
+		requestHash.put("projId", projID);
+		
+		if(verbose)
+			System.out.println("TEST@getProjectData: Sending everything now.");
+		
+		Com_object comIn = sendThroughSocket(userId, operationtype.see_proj, requestHash);
+		
+		if(verbose)
+			System.out.println("TEST@getProjectData: Now getting project info");
+		
+		answerHash = comIn.elements;
+		
+		if(verbose)
+			System.out.println("TEST@getProjectData: Got answerHash = "+ answerHash);
+		
+		return answerHash;
+	}
+	
+	public static boolean checkAdmin(int userId){
+		Hashtable<String, String> requestHash = new Hashtable<String, String>();
+		
+		requestHash.put("userId", Integer.toString(userId));
+		
+		if(verbose)
+			System.out.println("TEST@checkAdmin: Sending everything now.");
+		
+		Com_object comIn = sendThroughSocket(userId, operationtype.check_admin, requestHash);
+		
+		if(verbose)
+			System.out.println("TEST@checkAdmin: Now getting admin status confirmation");
+		
+		int iAnswer = Integer.parseInt(comIn.elements.get("admin"));
+		
+		if(verbose)
+			System.out.println("TEST@checkAdmin: Got Admin status iAnswer = "+ iAnswer);
+		
+		if(iAnswer == 0)
+			return true;
+		return false;
+	}
+	
+	public static boolean nukeProject(int userId, String projID){
+		Hashtable<String, String> requestHash = new Hashtable<String, String>();
+		
+		requestHash.put("userId", Integer.toString(userId));
+		requestHash.put("projID", projID);
+		
+		if(verbose)
+			System.out.println("TEST@nukeProject: Sending everything now.");
+		
+		Com_object comIn = sendThroughSocket(userId, operationtype.cancel_project, requestHash);
+		
+		if(verbose)
+			System.out.println("TEST@nukeProject: Now getting deletion confirmation");
+		
+		int iAnswer = Integer.parseInt(comIn.elements.get("delete"));
+		
+		if(verbose)
+			System.out.println("TEST@nukeProject: Got deletion status iAnswer = "+ iAnswer);
+		
+		if(iAnswer == 0)
+			return true;
+		return false;
+	}
 }
