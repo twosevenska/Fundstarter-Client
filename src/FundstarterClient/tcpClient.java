@@ -6,6 +6,7 @@ import java.io.*;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import globalClasses.Com_object;
+import globalClasses.menu_list;
 import globalClasses.Com_object.operationtype;
 
 public class tcpClient {
@@ -202,21 +203,98 @@ public class tcpClient {
 		tierHash.put("reqAmmount", reqAmmount);
 		
 		if(verbose)
-		System.out.println("TEST@createTier: Sending everything now.");
+			System.out.println("TEST@createTier: Sending everything now.");
 		
 		Com_object comIn = sendThroughSocket(userId, operationtype.add_meta, tierHash);
 		
 		if(verbose)
-		System.out.println("TEST@createTier: Now getting tier creation confirmation");
+			System.out.println("TEST@createTier: Now getting tier creation confirmation");
 		
 		status = Integer.parseInt(comIn.elements.get("tierStatus"));
 		
 		if(verbose)
-		System.out.println("TEST@createTier: Got status = "+ status);
+			System.out.println("TEST@createTier: Got status = "+ status);
 		
 		if(status == 0)
 			return true;
 		return false;
 	}
 	
+	
+	public static menu_list getProjectsList(boolean oldFlag){
+		menu_list answer = null;
+		int startIndex = 1;
+		String[] strListRaw = null;
+		String[] idListRaw = null;
+		
+		Hashtable<String, String> menuHash = new Hashtable<String, String>();
+		
+		if(verbose)
+			System.out.println("TEST@getProjectsList: Sending everything now.");
+		
+		if(oldFlag){
+			Com_object comIn1 = sendThroughSocket(0, operationtype.see_all_proj_off, menuHash);
+			Com_object comIn2 = sendThroughSocket(0, operationtype.see_all_proj_on, menuHash);
+			
+			strListRaw = concatStringArray(comIn1.menuList.menuString, comIn2.menuList.menuString);
+			idListRaw = concatStringArray(comIn1.menuList.menuID, comIn2.menuList.menuID);
+		}else{
+			Com_object comIn = sendThroughSocket(0, operationtype.see_all_proj_on, menuHash);
+			strListRaw = comIn.menuList.menuString;
+			idListRaw = comIn.menuList.menuID;
+		}
+		
+		if(verbose)
+			System.out.println("TEST@getProjectsList: Got the menu options.");
+		
+		String[] strList = formatStringArray(strListRaw, startIndex);
+		strList[0] = "\t0. Main menu";
+		String[] idList = formatIdArray(idListRaw, startIndex);
+		idList[0] = "Wubba lubba dub dub";
+		
+		answer = new menu_list(strList, idList);
+		
+		return answer;
+	}
+	
+	private static String[] formatStringArray(String[] array1, int start){
+		String[] result = new String[array1.length+start];
+		int i = start;
+		
+		for(String str: array1){
+			result[i] = "\t".concat(Integer.toString(i).concat(". ").concat(str));
+			i++;
+		}
+		
+		return result;
+	}
+	
+	private static String[] formatIdArray(String[] array1, int start){
+		String[] result = new String[array1.length+start];
+		int i = start;
+		
+		for(String str: array1){
+			result[i] = str;
+			i++;
+		}
+		
+		return result;
+	}
+	
+	private static String[] concatStringArray(String[] array1, String[] array2){
+		String[] result = new String[array1.length + array2.length];
+		int i = 0;
+		
+		for(String str: array1){
+			result[i] = str;
+			i++;
+		}
+		
+		for(String str: array2){
+			result[i] = str;
+			i++;
+		}
+		
+		return result;
+	}
 }

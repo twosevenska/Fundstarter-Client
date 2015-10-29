@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 
 import FundstarterClient.inputCheck;
+import globalClasses.menu_list;
 
 public class menuNavigation {
 	
@@ -174,12 +175,12 @@ public class menuNavigation {
 	}
 	
 	public static void showProjectsMenu(boolean owned){
-		//Adapt this function to get part of the menu from the server
-		//Almost there, you forgot the project id... Best solution, create a custom object with two String[]
-		/*boolean oldFlag = false;
+		boolean oldFlag = false;
 		String[] ansArr = {"1","2"};
+		menu_list projListObject;
 		String[] projListArray;
-		String[] projListAnswer;
+		String[] projListIds;
+ 		String[] projListAnswer;
 		int projListSize;
 		int answer;
 		
@@ -190,16 +191,18 @@ public class menuNavigation {
 		answer = inputCheck.getMenuAnswer(ansArr);
 		
 		switch (answer){
-		case 1:	oldFlag = true;
-				break;
-		case 2: break;
+		case 1:	break;
+		case 2: oldFlag = true;
+			break;
 		default:System.out.println("Err: Show Old Menu - Switch case not found for " + answer);
 				break;
 		}
 		
 		
-		projListArray = tcpClient.getProjectsList(oldFlag);
-		projListSize = projListArray.length();
+		projListObject = tcpClient.getProjectsList(oldFlag);
+		projListArray = projListObject.menuString;
+		projListIds = projListObject.menuID;
+		projListSize = projListArray.length;
 		projListAnswer = createAnswerList(projListSize);
 		
 		for(String str : projListArray)
@@ -207,21 +210,7 @@ public class menuNavigation {
 		
 		answer = inputCheck.getMenuAnswer(projListAnswer);
 		if(answer > 0 && answer < projListSize)
-			showProjectOptionMenu(projList[answer][0]);
-		
-		//Call function to get an object with a project names and ids
-		/*System.out.println("Choose an option:");
-		ansArr2[0] = "0";
-		System.out.println("\t0. Main menu");
-		for(Object t: projList){
-			if()
-			System.out.println("\t"+i+". Project - "+t[i][1]);
-			ansArr2[i] = ""+i;
-			i++;
-		}
-		answer = inputCheck.getMenuAnswer(ansArr2);
-		if(answer > 0 && answer <= i)
-			showProjectOptionMenu(projList[answer][0]);*/
+			showProjectOptionMenu(projListIds[answer]);
 	}
 	
 	private static String[] createAnswerList(int size){
