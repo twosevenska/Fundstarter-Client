@@ -320,10 +320,11 @@ public class tcpClient {
 		return answerHash;
 	}
 	
-	public static boolean checkAdmin(int userId){
+	public static boolean checkAdmin(int userId, String projId){
 		Hashtable<String, String> requestHash = new Hashtable<String, String>();
 		
 		requestHash.put("userId", Integer.toString(userId));
+		requestHash.put("projId", projId);
 		
 		if(verbose)
 			System.out.println("TEST@checkAdmin: Sending everything now.");
@@ -354,13 +355,166 @@ public class tcpClient {
 		
 		Com_object comIn = sendThroughSocket(userId, operationtype.cancel_project, requestHash);
 		
-		if(verbose)
+		if(verbose){
 			System.out.println("TEST@nukeProject: Now getting deletion confirmation");
+			System.out.println("TEST@nukeProject: Got the hash: "+comIn.elements);
+		}
 		
 		int iAnswer = Integer.parseInt(comIn.elements.get("delete"));
 		
 		if(verbose)
 			System.out.println("TEST@nukeProject: Got deletion status iAnswer = "+ iAnswer);
+		
+		if(iAnswer == 0)
+			return true;
+		return false;
+	}
+	
+	public static menu_list getRewardsMenu(String projID){
+		menu_list answer = null;
+		int startIndex = 1;
+		String[] strListRaw = null;
+		String[] idListRaw = null;
+		
+		Hashtable<String, String> menuHash = new Hashtable<String, String>();
+		
+		if(verbose)
+			System.out.println("TEST@getRewardsMenu: Sending everything now.");
+		
+		Com_object comIn = sendThroughSocket(0, operationtype.see_all_rewards, menuHash);
+		strListRaw = comIn.menuList.menuString;
+		idListRaw = comIn.menuList.menuID;
+		
+		if(verbose)
+			System.out.println("TEST@getRewardsMenu: Got the menu options.");
+		
+		String[] strList = formatStringArray(strListRaw, startIndex);
+		strList[0] = "\t0. Previous menu";
+		String[] idList = formatIdArray(idListRaw, startIndex);
+		idList[0] = "WHATUP MY GLIP GLOPS";
+		
+		answer = new menu_list(strList, idList);
+		
+		return answer;
+	}
+	
+	public static Hashtable< String, String> getTierInfo(int userId, String projID, String rewID){
+		Hashtable<String, String> requestHash = new Hashtable<String, String>();
+		Hashtable<String, String> answerHash;
+		
+		requestHash.put("projId", projID);
+		requestHash.put("rewID", rewID);
+		
+		if(verbose)
+			System.out.println("TEST@getTierInfo: Sending everything now.");
+		
+		Com_object comIn = sendThroughSocket(userId, operationtype.see_reward, requestHash);
+		
+		if(verbose)
+			System.out.println("TEST@getTierInfo: Now getting tier info");
+		
+		answerHash = comIn.elements;
+		
+		if(verbose)
+			System.out.println("TEST@getTierInfo: Got answerHash = "+ answerHash);
+		
+		return answerHash;
+	}
+	
+	
+	public static boolean nukeTier(int userId, String projID, String rewID){
+		Hashtable<String, String> requestHash = new Hashtable<String, String>();
+		
+		requestHash.put("userId", Integer.toString(userId));
+		requestHash.put("projID", projID);
+		requestHash.put("rewID", rewID);
+		
+		if(verbose)
+			System.out.println("TEST@nukeTier: Sending everything now.");
+		
+		Com_object comIn = sendThroughSocket(userId, operationtype.remove_meta, requestHash);
+		
+		if(verbose)
+			System.out.println("TEST@nukeTier: Now getting deletion confirmation");
+		
+		int iAnswer = Integer.parseInt(comIn.elements.get("delete"));
+		
+		if(verbose)
+			System.out.println("TEST@nukeTier: Got deletion status iAnswer = "+ iAnswer);
+		
+		if(iAnswer == 0)
+			return true;
+		return false;
+	}
+	
+	public static boolean addPledge(int userId, String rewID, String ammount){
+		Hashtable<String, String> requestHash = new Hashtable<String, String>();
+		
+		requestHash.put("userId", Integer.toString(userId));
+		requestHash.put("rewID", rewID);
+		requestHash.put("ammount", ammount);
+		
+		if(verbose)
+			System.out.println("TEST@addPledge: Sending everything now.");
+		
+		Com_object comIn = sendThroughSocket(userId, operationtype.pledge_project, requestHash);
+		
+		if(verbose)
+			System.out.println("TEST@addPledge: Now getting pledge confirmation");
+		
+		int iAnswer = Integer.parseInt(comIn.elements.get("pledgeConfirm"));
+		
+		if(verbose)
+			System.out.println("TEST@addPledge: Got pledgeConfirm status iAnswer = "+ iAnswer);
+		
+		if(iAnswer == 0)
+			return true;
+		return false;
+	}
+	
+	public static boolean changePledge(int userId, String rewID, String ammount){
+		Hashtable<String, String> requestHash = new Hashtable<String, String>();
+		
+		requestHash.put("userId", Integer.toString(userId));
+		requestHash.put("rewID", rewID);
+		requestHash.put("ammount", ammount);
+		
+		if(verbose)
+			System.out.println("TEST@changePledge: Sending everything now.");
+		
+		Com_object comIn = sendThroughSocket(userId, operationtype.change_pledge, requestHash);
+		
+		if(verbose)
+			System.out.println("TEST@changePledge: Now getting confirmation of pledge change");
+		
+		int iAnswer = Integer.parseInt(comIn.elements.get("pledgeChangeConfirm"));
+		
+		if(verbose)
+			System.out.println("TEST@changePledge: Got pledgeConfirm status pledgeChangeConfirm = "+ iAnswer);
+		
+		if(iAnswer == 0)
+			return true;
+		return false;
+	}
+	
+	public static boolean removePledge(int userId, String rewID){
+		Hashtable<String, String> requestHash = new Hashtable<String, String>();
+		
+		requestHash.put("userId", Integer.toString(userId));
+		requestHash.put("rewID", rewID);
+		
+		if(verbose)
+			System.out.println("TEST@removePledge: Sending everything now.");
+		
+		Com_object comIn = sendThroughSocket(userId, operationtype.remove_pledge, requestHash);
+		
+		if(verbose)
+			System.out.println("TEST@removePledge: Now getting confirmation of pledge remove");
+		
+		int iAnswer = Integer.parseInt(comIn.elements.get("pledgeRemoveConfirm"));
+		
+		if(verbose)
+			System.out.println("TEST@removePledge: Got pledgeConfirm status pledgeRemoveConfirm = "+ iAnswer);
 		
 		if(iAnswer == 0)
 			return true;

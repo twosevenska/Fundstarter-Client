@@ -224,7 +224,7 @@ public class menuNavigation {
 	}
 	
 	public static void showProjectOptionMenu(String projID){
-		boolean active = true;
+		boolean active = false;
 		boolean admin = false;
 		String title = null;
 		String progress = null;
@@ -235,8 +235,8 @@ public class menuNavigation {
 		
 		projectInfo = tcpClient.getProjectData(userId, projID);
 		
-		if(projectInfo.get("active") != "0")
-			active = false;
+		if(projectInfo.get("active").compareTo("0") == 0)
+			active = true;
 		
 		if(active){
 			title = projectInfo.get("title");
@@ -244,7 +244,7 @@ public class menuNavigation {
 			description = projectInfo.get("description");
 			endDate = projectInfo.get("endDate");
 			System.out.println("Project - " + title);
-			System.out.println("Status: " + progress + "\tCloses on: " + endDate);
+			System.out.println("Status: " + progress + "\t Closes on: " + endDate);
 			System.out.println("Description: - " + description);
 		}else{
 			title = projectInfo.get("title");
@@ -255,15 +255,16 @@ public class menuNavigation {
 			System.out.println("Description: - " + description);
 		}
 		
-		admin = tcpClient.checkAdmin(userId);
+		admin = tcpClient.checkAdmin(userId, projID);
 
 		System.out.println("Choose an option:");
 		System.out.println("\t0. Main menu");
 		System.out.println("\t1. View Reward tiers");
 		System.out.println("\t2. View Message Board");
-		if(admin && !active){
+		if(admin && active){
 			System.out.println("\t3. Cancel Project");
-			String[] ansArr = {"1","2","3","0"};
+			System.out.println("\t4. Create Tier Reward");
+			String[] ansArr = {"1","2","3","4","0"};
 			answer = inputCheck.getMenuAnswer(ansArr);
 		}else{
 			String[] ansArr = {"1","2","0"};
@@ -277,8 +278,17 @@ public class menuNavigation {
 			case 2:	listNotificationsMenu(projID);
 					break;
 			case 3:	boolean nuke = inputCheck.areYouSure();
-					if(nuke)
-						tcpClient.nukeProject(userId, projID);
+					if(nuke){
+						boolean nukeResult = tcpClient.nukeProject(userId, projID);
+						if(nukeResult){
+							System.out.println("Project deleted. We hope your next project is even more amazing :)");
+						}else{
+							System.out.println("Sorry but we couldn't delete this project right now.");
+							System.out.println("Please try again later.");
+						}
+					}
+					break;
+			case 4: createTier(projID);
 					break;
 			default:System.out.println("Err: User Panel Menu - Switch case not found for " + answer);
 					break;
@@ -286,55 +296,53 @@ public class menuNavigation {
 	}
 	
 	public static void listRewardsMenu(String projID){
-		//Adapt this for server side list
-		boolean admin = false;
-		String[] ansArr2 = new String[1000];
-		String[][] rewList = null;
+		menu_list rewListObject;
+		String[] rewList = null;
+		String[] rewListId = null;
+		String[] rewListAnswer = null;
+		int rewListSize = 0;
 		int answer;
-		int i;
-		
-		//Call function to get an object with the rewards title and id
 		
 		System.out.println("Choose an option:");
-		ansArr2[0] = "0";
-		System.out.println("\t0. Previous menu");
-		System.out.println("\t1. Create reward");
-		for(i = 2; i<rewList.length;i++){
-			System.out.println("\t"+i+". Project - "+rewList[i][1]);
-			ansArr2[i] = ""+i;
-		}
-		answer = inputCheck.getMenuAnswer(ansArr2);
+		
+		rewListObject = tcpClient.getRewardsMenu(projID);
+		rewList = rewListObject.menuString;
+		rewListId = rewListObject.menuID;
+		rewListSize = rewList.length;
+		rewListAnswer = createAnswerList(rewListSize);
+		
+		for(String str : rewList)
+			System.out.println(str);
+		
+		answer = inputCheck.getMenuAnswer(rewListAnswer);
 		if(answer == 0){
 			showProjectOptionMenu(projID);
-		}else if(answer == 1){
-			if(admin){
-				createTier(projID);
-			}else{
-				System.out.println("I can't let you do that.");
-			}
-		}else if(answer > 1 && answer <= i){
-			showRewardMenu(projID, rewList[i][0]);
+		}else if(answer > 1 && answer <= rewListSize){
+			showRewardMenu(projID, rewListId[answer]);
 		}else{
 			System.out.println("Err: Invalid option on reward selection menu.");
 		}
 	}
 	
 	private static void showRewardMenu(String projID, String rewID){
-		/*TODO: 
-		 * Make menu
-		 * Create a pledge
-		 * Modify a pledge
-		 * Remove pledge
-		 * Remove tier
-		 */
 		boolean active = true;
 		boolean admin = false;
 		String title = null;
 		String ammount = null;
 		String description = null;
 		String pledgeAmmount = "0";
+		Hashtable<String, String> tierInfo;
 		
-		//Call function to get all info from project
+		tierInfo = tcpClient.getTierInfo(userId, projID, rewID);
+		ammount = tierInfo.get("ammount");
+		title = "Pledge $".concat(ammount).concat("  or more");;
+		description = tierInfo.get("description");
+		pledgeAmmount = tierInfo.get("pledgeAmmount");
+		
+		
+		if(tierInfo.get("active").compareTo("0") == 0)
+			active = true;
+		admin = tcpClient.checkAdmin(userId, projID);
 		
 		System.out.println("Title - " + title);
 		System.out.println("Minimum ammount: " + ammount + "\tPledge: " + pledgeAmmount);
@@ -354,7 +362,7 @@ public class menuNavigation {
 			System.out.println("\t1. Add a pledge");
 			System.out.println("\t2. Change pledge");
 			System.out.println("\t3. Remove pledge");
-			if(admin && !active){
+			if(admin && active){
 				System.out.println("\t4. Remove tier");
 				String[] ansArr = {"1","2","3","4","0"};
 			}
@@ -372,8 +380,15 @@ public class menuNavigation {
 				case 3:	changePledgeMenu(projID, rewID, false);
 						break;
 				case 4:	boolean nuke = inputCheck.areYouSure();
-						//if(nuke)
-							//Call function to delete tier
+						if(nuke){
+							boolean nukeResult = tcpClient.nukeTier(userId, projID, rewID);
+							if(nukeResult){
+								System.out.println("Tier deleted.");
+							}else{
+								System.out.println("Sorry but we couldn't remove this tier right now.");
+								System.out.println("Please try again later.");
+							}
+						}
 						break;
 				default:System.out.println("Err: User Panel Menu - Switch case not found for " + answer);
 						break;
@@ -384,16 +399,34 @@ public class menuNavigation {
 	private static void addPledgeMenu(String projID, String rewID){
 		System.out.println("Please choose the ammount you wish add to this tier:");
 		String pledgeDosh = inputCheck.getMoney();
-		//Call function to add pledge
+		boolean result = tcpClient.addPledge(userId, rewID, pledgeDosh);
+		if(result){
+			System.out.println("Pledge successfull. Thank you!");
+		}else{
+			System.out.println("Ops, something went wrong :?");
+			System.out.println("Please try again later.");
+		}
 	}
 	
 	private static void changePledgeMenu(String projID, String rewID, boolean modify){
 		if(modify){
 			System.out.println("Please choose the ammount you wish to change it to:");
 			String pledgeDosh = inputCheck.getMoney();
-			//Call function to change pledge value
+			boolean result = tcpClient.changePledge(userId, rewID, pledgeDosh);
+			if(result){
+				System.out.println("Pledge changed.");
+			}else{
+				System.out.println("Ops, something went wrong :?");
+				System.out.println("Please try again later.");
+			}
 		}else{
-			//Call function to change value to 0 and check if there's no other pledge from this user -None-> change so it doesn't show up on owned 
+			boolean result = tcpClient.removePledge(userId, rewID);
+			if(result){
+				System.out.println("Pledge removed. Hope you find another project to pledge :)!");
+			}else{
+				System.out.println("Ops, something went wrong :?");
+				System.out.println("Please try again later.");
+			}
 		}
 	}
 	

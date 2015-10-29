@@ -40,7 +40,10 @@ public class Com_object implements Serializable{
 		check_wallet,
 		add_wallet,
 		see_proj,
-		check_admin
+		check_admin,
+		see_all_rewards,
+		change_pledge,
+		remove_pledge
 	}
 	
 	public long generateIdPackage(int id)//generate id for the request
