@@ -43,7 +43,8 @@ public class Com_object implements Serializable{
 		check_admin,
 		see_all_rewards,
 		change_pledge,
-		remove_pledge
+		remove_pledge,
+		see_vote_options
 	}
 	
 	public long generateIdPackage(int id)//generate id for the request

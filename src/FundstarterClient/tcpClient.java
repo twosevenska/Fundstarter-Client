@@ -520,4 +520,32 @@ public class tcpClient {
 			return true;
 		return false;
 	}
+	
+	public static menu_list getVoteOptions(String projID){
+		menu_list answer = null;
+		int startIndex = 1;
+		String[] strListRaw = null;
+		String[] idListRaw = null;
+		
+		Hashtable<String, String> menuHash = new Hashtable<String, String>();
+		
+		if(verbose)
+			System.out.println("TEST@getVoteOptions: Sending everything now.");
+		
+		Com_object comIn = sendThroughSocket(0, operationtype.see_vote_options, menuHash);
+		strListRaw = comIn.menuList.menuString;
+		idListRaw = comIn.menuList.menuID;
+		
+		if(verbose)
+			System.out.println("TEST@getVoteOptions: Got the vote options.");
+		
+		String[] strList = formatStringArray(strListRaw, startIndex);
+		strList[0] = "\t0. Return to Project menu";
+		String[] idList = formatIdArray(idListRaw, startIndex);
+		idList[0] = "It's time to get schwifty.";
+		
+		answer = new menu_list(strList, idList);
+		
+		return answer;
+	}
 }

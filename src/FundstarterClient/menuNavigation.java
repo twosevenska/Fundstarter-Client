@@ -430,6 +430,35 @@ public class menuNavigation {
 		}
 	}
 	
+	public static void listVoteOptions(String projID){
+		menu_list voteListObject;
+		String[] voteList = null;
+		String[] voteListId = null;
+		String[] voteListAnswer = null;
+		int voteListSize = 0;
+		int answer;
+		
+		System.out.println("Please choose the option you wish to vote on:");
+		
+		voteListObject = tcpClient.getVoteOptions(projID);
+		voteList = voteListObject.menuString;
+		voteListId = voteListObject.menuID;
+		voteListSize = voteList.length;
+		voteListAnswer = createAnswerList(voteListSize);
+		
+		for(String str : voteList)
+			System.out.println(str);
+		
+		answer = inputCheck.getMenuAnswer(voteListAnswer);
+		if(answer == 0){
+			showProjectOptionMenu(projID);
+		}else if(answer > 1 && answer <= voteListSize){
+			showRewardMenu(projID, voteListId[answer]);
+		}else{
+			System.out.println("Err: Invalid option on vote selection menu.");
+		}
+	}
+	
 	public static void listNotificationsMenu(String projID){
 		//Adapt this for server side list
 		boolean admin = false;
