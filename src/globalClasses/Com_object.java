@@ -28,7 +28,7 @@ public class Com_object implements Serializable{
 		login,
 		register,
 		create_proj,
-		see_proj_my,
+		see_my_reward,
 		check_query,
 		pledge_project,
 		see_pledges,
@@ -44,7 +44,10 @@ public class Com_object implements Serializable{
 		see_all_rewards,
 		change_pledge,
 		remove_pledge,
-		see_vote_options
+		see_vote_options,
+		get_notification,
+		create_message,
+		answer_message
 	}
 	
 	public long generateIdPackage(int id)//generate id for the request

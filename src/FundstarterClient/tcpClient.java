@@ -447,12 +447,13 @@ public class tcpClient {
 		return false;
 	}
 	
-	public static boolean addPledge(int userId, String rewID, String ammount){
+	public static boolean addPledge(int userId, String rewID, String ammount, String voteId){
 		Hashtable<String, String> requestHash = new Hashtable<String, String>();
 		
 		requestHash.put("userId", Integer.toString(userId));
 		requestHash.put("rewID", rewID);
 		requestHash.put("ammount", ammount);
+		requestHash.put("voteId", voteId);
 		
 		if(verbose)
 			System.out.println("TEST@addPledge: Sending everything now.");
@@ -548,4 +549,126 @@ public class tcpClient {
 		
 		return answer;
 	}
+	
+	public static menu_list getMyRewards(int userId){
+		menu_list answer = null;
+		Hashtable<String, String> requestHash = new Hashtable<String, String>();
+		
+		requestHash.put("userId", Integer.toString(userId));
+		
+		if(verbose)
+			System.out.println("TEST@getMyRewards: Sending everything now.");
+		
+		Com_object comIn = sendThroughSocket(userId, operationtype.see_my_reward, requestHash);
+		
+		if(verbose)
+			System.out.println("TEST@getMyRewards: Got my rewards list.");
+		
+		answer = comIn.menuList;
+		
+		return answer;
+	}
+	
+	public static menu_list getMessageBoard(String projId){
+		menu_list answer = null;
+		int startIndex = 2;
+		String[] strListRaw = null;
+		String[] idListRaw = null;
+		
+		Hashtable<String, String> requestHash = new Hashtable<String, String>();
+		
+		requestHash.put("projId", projId);
+		
+		if(verbose)
+			System.out.println("TEST@getMessageBoard: Sending everything now.");
+		
+		Com_object comIn = sendThroughSocket(0, operationtype.see_proj_responses, requestHash);
+		strListRaw = comIn.menuList.menuString;
+		idListRaw = comIn.menuList.menuID;
+		
+		if(verbose)
+			System.out.println("TEST@getMessageBoard: Got the message board.");
+		
+		String[] strList = formatStringArray(strListRaw, startIndex);
+		strList[0] = "\t0. Return to Project menu";
+		strList[1] = "\t1. Create a Message";
+		String[] idList = formatIdArray(idListRaw, startIndex);
+		idList[0] = "Let's just see where this goes...";
+		idList[1] = "Let's get RIGGITY WRECKED";
+		
+		answer = new menu_list(strList, idList);
+		
+		return answer;
+	}
+	
+	public static Hashtable< String, String> getNotification(int userId, String notID){
+		Hashtable<String, String> requestHash = new Hashtable<String, String>();
+		Hashtable<String, String> resultHash = null;
+		
+		requestHash.put("notID", notID);
+		
+		if(verbose)
+			System.out.println("TEST@getNotification: Sending everything now.");
+		
+		Com_object comIn = sendThroughSocket(userId, operationtype.get_notification, requestHash);
+		
+		if(verbose)
+			System.out.println("TEST@getNotification: Now getting Message info");
+		
+		resultHash = comIn.elements;
+		
+		return resultHash;
+	}
+	
+	public static boolean createNotification(int userId, String projId, String title, String descri){
+		Hashtable<String, String> requestHash = new Hashtable<String, String>();
+		
+		requestHash.put("userId", Integer.toString(userId));
+		requestHash.put("projId", projId);
+		requestHash.put("title", title);
+		requestHash.put("descri", descri);
+		
+		if(verbose)
+			System.out.println("TEST@createNotification: Sending everything now.");
+		
+		Com_object comIn = sendThroughSocket(userId, operationtype.create_message, requestHash);
+		
+		if(verbose)
+			System.out.println("TEST@createNotification: Now getting message thread creation confirmation");
+		
+		int iAnswer = Integer.parseInt(comIn.elements.get("createMessage"));
+		
+		if(verbose)
+			System.out.println("TEST@createNotification: Got createMessage = "+ iAnswer);
+		
+		if(iAnswer == 0)
+			return true;
+		return false;
+	}
+	
+	public static boolean answerNotification(int userId, String projId, String descri){
+		Hashtable<String, String> requestHash = new Hashtable<String, String>();
+		
+		requestHash.put("userId", Integer.toString(userId));
+		requestHash.put("projId", projId);
+		requestHash.put("descri", descri);
+		
+		if(verbose)
+			System.out.println("TEST@answerNotification: Sending everything now.");
+		
+		Com_object comIn = sendThroughSocket(userId, operationtype.answer_message, requestHash);
+		
+		if(verbose)
+			System.out.println("TEST@answerNotification: Now getting reply message confirmation");
+		
+		int iAnswer = Integer.parseInt(comIn.elements.get("answerMessage"));
+		
+		if(verbose)
+			System.out.println("TEST@answerNotification: Got answerMessage = "+ iAnswer);
+		
+		if(iAnswer == 0)
+			return true;
+		return false;
+	}
+	
 }

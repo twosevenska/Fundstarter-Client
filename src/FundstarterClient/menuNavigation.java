@@ -34,7 +34,7 @@ public class menuNavigation {
 					break;
 			case 2:	registerCheck();
 					break;
-			case 3:	showProjectsMenu(false);
+			case 3:	showProjectsMenu();
 					break;
 			default:System.out.println("Err: Main Menu - Switch case not found for " + answer);
 					break;
@@ -85,7 +85,7 @@ public class menuNavigation {
 		System.out.println("Choose an option:");
 		System.out.println("\t0. Main menu");
 		System.out.println("\t1. Add money to wallet");
-		System.out.println("\t2. Show Projects you pledged");
+		System.out.println("\t2. Show your rewards");
 		System.out.println("\t3. Create a Project");
 		String[] ansArr = {"1","2","3","0"};
 		int answer = inputCheck.getMenuAnswer(ansArr);
@@ -94,7 +94,7 @@ public class menuNavigation {
 			case 0: break;
 			case 1:	addWalletMoney();
 					break;
-			case 2:	showProjectsMenu(true);
+			case 2:	showYourRewards();
 					break;
 			case 3:	createProjectMenu();
 					break;
@@ -116,6 +116,22 @@ public class menuNavigation {
 			System.out.println("Please try again later.");
 		}
 			
+	}
+	
+	private static void showYourRewards(){
+		String[] ansArr = {"0"};
+		
+		String[] rewardsList = tcpClient.getMyRewards(userId).menuString;
+		
+		for(String str:rewardsList)
+			System.out.println(str);
+		
+		System.out.println("\n\nChoose an option:");
+		System.out.println("\t0. Return to previous menu");
+		
+		int answer = inputCheck.getMenuAnswer(ansArr);
+		if(answer == 0)
+			loginMenu();
 	}
 	
 	private static void createProjectMenu(){
@@ -174,7 +190,7 @@ public class menuNavigation {
 		}
 	}
 	
-	public static void showProjectsMenu(boolean owned){
+	public static void showProjectsMenu(){
 		boolean oldFlag = false;
 		String[] ansArr = {"1","2"};
 		menu_list projListObject;
@@ -373,7 +389,7 @@ public class menuNavigation {
 			switch (answer){
 				case 0: listRewardsMenu(projID);
 						break;
-				case 1:	addPledgeMenu(projID, rewID);
+				case 1:	addPledgeMenu(projID, rewID, Integer.parseInt(ammount));
 						break;
 				case 2:	changePledgeMenu(projID, rewID, true);
 						break;
@@ -396,10 +412,17 @@ public class menuNavigation {
 		}
 	}
 	
-	private static void addPledgeMenu(String projID, String rewID){
+	private static void addPledgeMenu(String projID, String rewID, int minimum){
+		String pledgeDosh = null;
+		boolean invalid = true;
+		String voteId = listVoteOptions(projID);
 		System.out.println("Please choose the ammount you wish add to this tier:");
-		String pledgeDosh = inputCheck.getMoney();
-		boolean result = tcpClient.addPledge(userId, rewID, pledgeDosh);
+		while(invalid){
+			pledgeDosh = inputCheck.getMoney();
+			if(Integer.parseInt(pledgeDosh) >= minimum)
+				invalid = false;
+		}
+		boolean result = tcpClient.addPledge(userId, rewID, pledgeDosh, voteId);
 		if(result){
 			System.out.println("Pledge successfull. Thank you!");
 		}else{
@@ -410,7 +433,11 @@ public class menuNavigation {
 	
 	private static void changePledgeMenu(String projID, String rewID, boolean modify){
 		if(modify){
-			System.out.println("Please choose the ammount you wish to change it to:");
+			System.out.println("We're sorry but this feature is still being cooked in the magic cauldron.");
+			/* //This code is for a possible future instruction. Missing the SQL Query
+			//section, wasn't completed since it wasn't needed for this goal. Also missing
+			//minimum amount check.
+			System.out.println("Please choose the amount you wish to change it to:");
 			String pledgeDosh = inputCheck.getMoney();
 			boolean result = tcpClient.changePledge(userId, rewID, pledgeDosh);
 			if(result){
@@ -418,7 +445,7 @@ public class menuNavigation {
 			}else{
 				System.out.println("Ops, something went wrong :?");
 				System.out.println("Please try again later.");
-			}
+			}*/
 		}else{
 			boolean result = tcpClient.removePledge(userId, rewID);
 			if(result){
@@ -430,7 +457,7 @@ public class menuNavigation {
 		}
 	}
 	
-	public static void listVoteOptions(String projID){
+	public static String listVoteOptions(String projID){
 		menu_list voteListObject;
 		String[] voteList = null;
 		String[] voteListId = null;
@@ -453,59 +480,78 @@ public class menuNavigation {
 		if(answer == 0){
 			showProjectOptionMenu(projID);
 		}else if(answer > 1 && answer <= voteListSize){
-			showRewardMenu(projID, voteListId[answer]);
+			return voteListId[answer];
 		}else{
 			System.out.println("Err: Invalid option on vote selection menu.");
 		}
+		return "0";
 	}
 	
 	public static void listNotificationsMenu(String projID){
-		//Adapt this for server side list
-		boolean admin = false;
-		String[][] notList = null;
-		String[] ansArr2 = new String[1000];
-		int i;
+		menu_list notListObject;
+		String[] notList = null;
+		String[] notListId = null;
+		String[] notListAnswer = null;
+		int notListSize = 0;
 		int answer;
-		//Call function to get a notifications object with all their titles
 		
 		System.out.println("Choose an option:");
-		ansArr2[0] = "0";
-		ansArr2[0] = "1";
-		ansArr2[0] = "2";
-		System.out.println("\t0. Main menu");
-		System.out.println("\t1. Previous menu");
-		System.out.println("\t2. Create ");// logged?
-		for(i = 3; i<notList.length;i++){
-			System.out.println("\t"+i+". Title - "+notList[i][1]);
-			ansArr2[i] = ""+i;
-		}
-		answer = inputCheck.getMenuAnswer(ansArr2);
-		if(answer == 1){
+		
+		notListObject = tcpClient.getMessageBoard(projID);
+		notList = notListObject.menuString;
+		notListId = notListObject.menuID;
+		notListSize = notList.length;
+		notListAnswer = createAnswerList(notListSize);
+		
+		for(String str : notList)
+			System.out.println(str);
+		
+		answer = inputCheck.getMenuAnswer(notListAnswer);
+		if(answer == 0){
 			showProjectOptionMenu(projID);
-		}else if(answer == 2){
+		}else if(answer == 1){
 			createNotificationMenu(projID);
-		}else if(answer > 3 && answer <= i){
-			showNotificationMenu(projID, notList[answer][0]);
+		}else if(answer > 2 && answer <= notListSize){
+			showNotificationMenu(projID, notListId[answer]);
+		}else{
+			System.out.println("Err: Invalid option on Message menu.");
 		}
 	}
 	
 	private static void showNotificationMenu(String projID, String notID){
 		boolean admin = false;
 		boolean answered = false;
+		String title = null;
+		String user = null;
 		String description = null;
 		String notAnswer = null;
+		Hashtable<String, String> answerHash = null;
+		String[] ansArr = null;
 		
-		//function to get a notification title, description and user
-		//function to verify if it is answered
-		//function to verify if admin
+		
+		answerHash = tcpClient.getNotification(userId, notID);
+		title = answerHash.get(title);
+		user = answerHash.get(user);
+		description = answerHash.get(description);
+		notAnswer = answerHash.get(notAnswer);
+		
+		if(answerHash.get("answered").compareTo("0") == 0){
+			answered = true;
+		}
+		
+		admin = tcpClient.checkAdmin(userId, projID);
 		
 		System.out.println("Choose an option:");
 		System.out.println("\t1. Return to previous menu");
 		if(!answered && admin){
 			System.out.println("\t2. Answer");
-			String[] ansArr = {"1","2"};
+			ansArr = new String[2];
+			ansArr[0] = "1";
+			ansArr[1] = "2";
 		}
-		String[] ansArr = {"1"};
+		ansArr = new String[1];
+		ansArr[0] = "1";
+		
 		int answer = inputCheck.getMenuAnswer(ansArr);
 		
 		switch (answer){
@@ -519,23 +565,39 @@ public class menuNavigation {
 	}
 	
 	private static void createNotificationMenu(String projID){
-		String title;
-		String descri;
+		String title = null;
+		String descri = null;
+		boolean result = false;
 		
 		System.out.println("What's the title?");
 		title = inputCheck.getGeneralString();
 		System.out.println("Please give a small description.");
 		descri = inputCheck.getGeneralString();
 		
-		//Call function that sends this over to the server
+		result = tcpClient.createNotification(userId, projID, title, descri);
+		
+		if(result){
+			System.out.println("Message thread created succesfully. We hope we can answer it soon.");
+		}else{
+			System.out.println("Sorry but we couldn't create this message thread.");
+			System.out.println("Please try again later.");
+		}
 	}
 	
 	private static void answerNotificationMenu(String projID, String notID){
 		String descri;
+		boolean result = false;
 		
 		System.out.println("Please type your answer.");
 		descri = inputCheck.getGeneralString();
 		
-		//Call function that sends this over to the server
+		result = tcpClient.answerNotification(userId, projID, descri);
+		
+		if(result){
+			System.out.println("Message answered succesfully.");
+		}else{
+			System.out.println("Sorry but we couldn't create this reply.");
+			System.out.println("Please try again later.");
+		}
 	}
 }
