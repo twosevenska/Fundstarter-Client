@@ -86,7 +86,8 @@ public class menuNavigation {
 		System.out.println("\t1. Add money to wallet");
 		System.out.println("\t2. Show your rewards");
 		System.out.println("\t3. Create a Project");
-		String[] ansArr = {"1","2","3","0"};
+		System.out.println("\t4. My Projects");
+		String[] ansArr = {"1","2","3","4","0"};
 		int answer = inputCheck.getMenuAnswer(ansArr);
 		
 		switch (answer){
@@ -97,6 +98,8 @@ public class menuNavigation {
 					break;
 			case 3:	createProjectMenu();
 					break;
+			case 4:	showMyProjectsMenu();
+					break;
 			default:System.out.println("Err: User Panel Menu - Switch case not found for " + answer);
 					break;
 		}
@@ -106,7 +109,13 @@ public class menuNavigation {
 		String walletDOSH = "0";
 		boolean answer = false;
 		System.out.println("How much do you wish to add? ");
-		walletDOSH = inputCheck.getMoney();
+		walletDOSH = inputCheck.getMoney(true);
+		
+		if(Integer.parseInt(walletDOSH) == 0){
+			System.out.println("You chose to add 0 to your wallet. Returning you to the previous menu.");
+			loginMenu();
+		}
+		
 		answer = tcpClient.addMoneyWallet(userId, walletDOSH);
 		if (answer){
 			System.out.println("Your wallet has been updated. Capitalism, ho!");
@@ -153,7 +162,7 @@ public class menuNavigation {
 		
 		System.out.println("We hope that ends up being a day to remember :D");
 		System.out.println("We're still missing how much money you need:");
-		reqAmmount = inputCheck.getMoney();
+		reqAmmount = inputCheck.getMoney(false);
 		
 		status = tcpClient.createProject(userId, projName, descri, endDate, reqAmmount);
 		
@@ -177,7 +186,7 @@ public class menuNavigation {
 		descri = inputCheck.getGeneralString();
 		
 		System.out.println("What's the minimum ammount required for this tier?");
-		reqAmmount = inputCheck.getMoney();
+		reqAmmount = inputCheck.getMoney(false);
 		
 		status = tcpClient.createTier(userId, descri, reqAmmount);
 		
@@ -238,6 +247,29 @@ public class menuNavigation {
 		return answerList;
 	}
 	
+	public static void showMyProjectsMenu(){
+		boolean oldFlag = false;
+		menu_list projListObject;
+		String[] projListArray;
+		String[] projListIds;
+ 		String[] projListAnswer;
+		int projListSize;
+		int answer;
+		
+		projListObject = tcpClient.getMyProjectsList();
+		projListArray = projListObject.menuString;
+		projListIds = projListObject.menuID;
+		projListSize = projListArray.length;
+		projListAnswer = createAnswerList(projListSize);
+		
+		for(String str : projListArray)
+			System.out.println(str);
+		
+		answer = inputCheck.getMenuAnswer(projListAnswer);
+		if(answer > 0 && answer < projListSize)
+			showProjectOptionMenu(projListIds[answer]);
+	}
+	
 	public static void showProjectOptionMenu(String projID){
 		boolean active = false;
 		boolean admin = false;
@@ -255,7 +287,7 @@ public class menuNavigation {
 		
 		if(active){
 			title = projectInfo.get("title");
-			progress = projectInfo.get("progress");
+			progress = projectInfo.get("progress").concat("%");
 			description = projectInfo.get("description");
 			endDate = projectInfo.get("endDate");
 			System.out.println("Project - " + title);
@@ -265,6 +297,13 @@ public class menuNavigation {
 			title = projectInfo.get("title");
 			progress = projectInfo.get("progress");
 			description = projectInfo.get("description");
+			
+			if(Integer.parseInt(progress) < 100 ){
+				progress.concat(" - Funding Unsuccessful/Canceled");
+			}else{
+				progress.concat(" - Funded");
+			}
+				
 			System.out.println("Project - " + title);
 			System.out.println("Status: " + progress);
 			System.out.println("Description: - " + description);
@@ -332,7 +371,7 @@ public class menuNavigation {
 		answer = inputCheck.getMenuAnswer(rewListAnswer);
 		if(answer == 0){
 			showProjectOptionMenu(projID);
-		}else if(answer > 1 && answer <= rewListSize){
+		}else if(answer > 0 && answer <= rewListSize){
 			showRewardMenu(projID, rewListId[answer]);
 		}else{
 			System.out.println("Err: Invalid option on reward selection menu.");
@@ -346,6 +385,7 @@ public class menuNavigation {
 		String ammount = null;
 		String description = null;
 		String pledgeAmmount = "0";
+		String[] ansArr2;
 		Hashtable<String, String> tierInfo;
 		
 		tierInfo = tcpClient.getTierInfo(userId, projID, rewID);
@@ -364,7 +404,7 @@ public class menuNavigation {
 		System.out.println("Description:");
 		System.out.println(description);
 		
-		if(!active){
+		if(!active || !logged){
 			System.out.println("Choose an option:");
 			System.out.println("\t0. Previous menu");
 			String[] ansArr = {"0"};
@@ -379,11 +419,12 @@ public class menuNavigation {
 			System.out.println("\t3. Remove pledge");
 			if(admin && active){
 				System.out.println("\t4. Remove tier");
-				String[] ansArr = {"1","2","3","4","0"};
+				ansArr2 = new String[]{"1","2","3","4","0"};
+			}else{
+				ansArr2 = new String[]{"1","2","3","0"};
 			}
-			String[] ansArr = {"1","2","3","0"};
 			
-			int answer = inputCheck.getMenuAnswer(ansArr);
+			int answer = inputCheck.getMenuAnswer(ansArr2);
 			
 			switch (answer){
 				case 0: listRewardsMenu(projID);
@@ -415,11 +456,17 @@ public class menuNavigation {
 		String pledgeDosh = null;
 		boolean invalid = true;
 		String voteId = listVoteOptions(projID);
-		System.out.println("Please choose the ammount you wish add to this tier:");
+		System.out.println("Please choose the ammount you wish to add to this tier:");
 		while(invalid){
-			pledgeDosh = inputCheck.getMoney();
-			if(Integer.parseInt(pledgeDosh) >= minimum)
+			pledgeDosh = inputCheck.getMoney(true);
+			if(Integer.parseInt(pledgeDosh) >= minimum){
 				invalid = false;
+			}else if(Integer.parseInt(pledgeDosh) == 0){
+				System.out.println("You choose 0, so we're taking you back to the previous menu.");
+				showRewardMenu(projID, rewID);
+			}else{
+				System.out.println("Sorry, but the ammount inserted is lower than the minimum ammount required for this tier.");
+			}
 		}
 		boolean result = tcpClient.addPledge(userId, rewID, pledgeDosh, voteId);
 		if(result){
@@ -478,7 +525,7 @@ public class menuNavigation {
 		answer = inputCheck.getMenuAnswer(voteListAnswer);
 		if(answer == 0){
 			showProjectOptionMenu(projID);
-		}else if(answer > 1 && answer <= voteListSize){
+		}else if(answer > 0 && answer <= voteListSize){
 			return voteListId[answer];
 		}else{
 			System.out.println("Err: Invalid option on vote selection menu.");
@@ -508,9 +555,11 @@ public class menuNavigation {
 		answer = inputCheck.getMenuAnswer(notListAnswer);
 		if(answer == 0){
 			showProjectOptionMenu(projID);
-		}else if(answer == 1){
+		}else if(answer == 1 && logged){
 			createNotificationMenu(projID);
-		}else if(answer > 2 && answer <= notListSize){
+		}else if(answer == 1 && !logged){
+			System.out.println("Sorry but you need to login in order to post a message.");
+		}else if(answer > 1 && answer <= notListSize){
 			showNotificationMenu(projID, notListId[answer]);
 		}else{
 			System.out.println("Err: Invalid option on Message menu.");
@@ -529,16 +578,22 @@ public class menuNavigation {
 		
 		
 		answerHash = tcpClient.getNotification(userId, notID);
-		title = answerHash.get(title);
-		user = answerHash.get(user);
-		description = answerHash.get(description);
-		notAnswer = answerHash.get(notAnswer);
+		title = answerHash.get("title");
+		user = answerHash.get("user");
+		description = answerHash.get("description");
+		notAnswer = answerHash.get("notAnswer");
 		
 		if(answerHash.get("answered").compareTo("0") == 0){
 			answered = true;
 		}
 		
 		admin = tcpClient.checkAdmin(userId, projID);
+		
+		System.out.println("Title: \"" + title + "\" \nby " + "user");
+		System.out.println("Message: " + description);
+		
+		if(answered)
+			System.out.println("Answer: " + notAnswer);
 		
 		System.out.println("Choose an option:");
 		System.out.println("\t1. Return to previous menu");
@@ -547,9 +602,10 @@ public class menuNavigation {
 			ansArr = new String[2];
 			ansArr[0] = "1";
 			ansArr[1] = "2";
+		}else{
+			ansArr = new String[1];
+			ansArr[0] = "1";
 		}
-		ansArr = new String[1];
-		ansArr[0] = "1";
 		
 		int answer = inputCheck.getMenuAnswer(ansArr);
 		

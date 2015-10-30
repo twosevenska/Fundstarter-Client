@@ -144,7 +144,7 @@ public class tcpClient {
 		Hashtable<String, String> moneyHash = new Hashtable<String, String>();
 		
 		moneyHash.put("userId", Integer.toString(userId));
-		moneyHash.put("userId", money);
+		moneyHash.put("wallet", money);
 		
 		if(Main.verbose)
 			System.out.println("TEST@addMoneyWallet: Sending everything now.");
@@ -250,6 +250,36 @@ public class tcpClient {
 		strList[0] = "\t0. Main menu";
 		String[] idList = formatIdArray(idListRaw, startIndex);
 		idList[0] = "Wubba lubba dub dub";
+		
+		answer = new menu_list(strList, idList);
+		
+		return answer;
+	}
+	
+	public static menu_list getMyProjectsList(int userId){
+		menu_list answer = null;
+		int startIndex = 1;
+		String[] strListRaw = null;
+		String[] idListRaw = null;
+		
+		Hashtable<String, String> menuHash = new Hashtable<String, String>();
+		
+		menuHash.put("userId", Integer.toString(userId));
+		
+		if(Main.verbose)
+			System.out.println("TEST@getMyProjectsList: Sending everything now.");
+		
+		Com_object comIn = sendThroughSocket(0, operationtype.see_my_projs, menuHash);
+		strListRaw = comIn.menuList.menuString;
+		idListRaw = comIn.menuList.menuID;
+		
+		if(Main.verbose)
+			System.out.println("TEST@getMyProjectsList: Got the menu options.");
+		
+		String[] strList = formatStringArray(strListRaw, startIndex);
+		strList[0] = "\t0. Main menu";
+		String[] idList = formatIdArray(idListRaw, startIndex);
+		idList[0] = "Shut the **** up about moonmen";
 		
 		answer = new menu_list(strList, idList);
 		
@@ -616,6 +646,9 @@ public class tcpClient {
 		
 		resultHash = comIn.elements;
 		
+		if(Main.verbose)
+			System.out.println("TEST@getNotification: Got resultHash: " + resultHash);
+		
 		return resultHash;
 	}
 	
@@ -664,6 +697,29 @@ public class tcpClient {
 		
 		if(Main.verbose)
 			System.out.println("TEST@answerNotification: Got answerMessage = "+ iAnswer);
+		
+		if(iAnswer == 0)
+			return true;
+		return false;
+	}
+	
+	public static boolean checkProjectName(String projectTitle){
+		Hashtable<String, String> requestHash = new Hashtable<String, String>();
+		
+		requestHash.put("projectTitle", projectTitle);
+		
+		if(Main.verbose)
+			System.out.println("TEST@checkProjectName: Sending everything now.");
+		
+		Com_object comIn = sendThroughSocket(0, operationtype.check_proj_name, requestHash);
+		
+		if(Main.verbose)
+			System.out.println("TEST@checkProjectName: Now checking if the server found this a worthy name.");
+		
+		int iAnswer = Integer.parseInt(comIn.elements.get("projectTitle"));
+		
+		if(Main.verbose)
+			System.out.println("TEST@checkProjectName: Got answerMessage = "+ iAnswer);
 		
 		if(iAnswer == 0)
 			return true;

@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.Scanner;
 
 public class inputCheck {
+	
 	public static int getMenuAnswer(String[] valStr){
 		boolean valid = false;
 	
@@ -33,7 +34,7 @@ public class inputCheck {
 		Scanner sc = new Scanner(System.in);
 		while(!valid){
 			 readval = sc.nextLine();
-			if(true){//Change this to something that checks if the chosen name is available
+			if(tcpClient.checkProjectName(readval)){
 				valid = true;
 			}else{
 				System.out.println("Sorry but the name " + readval + " is already taken.");
@@ -83,30 +84,39 @@ public class inputCheck {
 	private static boolean checkValidDate(String dateInString){
 		//The conversion segment of this function was taken from the website http://www.mkyong.com/java/how-to-convert-string-to-date-java/
 		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+		formatter.setLenient(false);
 		Date currentDate = new Date();
 		try {
 			
+			if(Main.verbose)
+				System.out.println("TEST@checkValidDate: Got the following date in String format: " + dateInString);
+			
 			Date date = formatter.parse(dateInString);
+			
+			if(Main.verbose)
+				System.out.println("TEST@checkValidDate: Got the following date from String conversion: " + date);
 			
 			if(currentDate.compareTo(date) < 0){
 				return true;
 			}
 
 		} catch (ParseException e) {
-			e.printStackTrace();
+			return false;
 		}	
 		
 		return false;
 	}
 	
-	public static String getMoney(){
+	public static String getMoney(boolean allowZero){
 		boolean valid = false;
 		String readval = null;
 		
 		Scanner sc = new Scanner(System.in);
 		while(!valid){
 			readval = sc.nextLine();
-			if(checkIfInt(readval) && Integer.parseInt(readval) > 0){
+			if (checkIfInt(readval) && Integer.parseInt(readval) == 0 && allowZero){
+				valid = true;
+			}else if(checkIfInt(readval) && Integer.parseInt(readval) > 0){
 				valid = true;
 			}else{
 				System.out.println("Sorry but the ammount " + readval + " is not valid.");

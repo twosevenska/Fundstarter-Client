@@ -47,7 +47,9 @@ public class Com_object implements Serializable{
 		see_vote_options,
 		get_notification,
 		create_message,
-		answer_message
+		answer_message,
+		check_proj_name,
+		see_my_projs
 	}
 	
 	public long generateIdPackage(int id)//generate id for the request
