@@ -10,7 +10,6 @@ public class menuNavigation {
 	
 	static boolean logged = false;
 	static int userId = 0;
-	static boolean verbose = true;
 	
 	public static void splashScreen() {
 		System.out.println("    ______                __     __             __           ");
@@ -53,7 +52,7 @@ public class menuNavigation {
 			userId = tcpClient.loginUser(user, pass);
 			if(userId != 0)
 				logged = true;
-			if(verbose)
+			if(Main.verbose)
 				System.out.println("TEST@loginCheck: UserID = " + userId);
 		}else{
 			loginMenu();

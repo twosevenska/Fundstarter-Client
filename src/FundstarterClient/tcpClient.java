@@ -10,8 +10,7 @@ import globalClasses.menu_list;
 import globalClasses.Com_object.operationtype;
 
 public class tcpClient {
-	
-	static boolean verbose = true;
+
 	static Socket objsock = null;
 	static ObjectOutputStream oos;
 	static ObjectInputStream ois;
@@ -23,7 +22,7 @@ public class tcpClient {
 		try {
 			// First open the socket
 			objsock = new Socket("localhost", serversocket);
-			if(verbose)
+			if(Main.verbose)
 				System.out.println("SOCKET=" + objsock);
 			
 			// Now open the object streams
@@ -68,19 +67,19 @@ public class tcpClient {
 		loginData.put("username", username);
 		loginData.put("password", password);
 		
-		if(verbose){
+		if(Main.verbose){
 			System.out.println("TEST@loginUser: Sending hash = " );
 			System.out.println(loginData);
 			System.out.println("TEST@loginUser: Sending everything now.");
 		}
 		Com_object comIn = sendThroughSocket(userId, operationtype.login, loginData);
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@loginUser: Now getting userID");
 		
 		userId = Integer.parseInt(comIn.elements.get("userid"));
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@loginUser: Got userID = "+ userId);
 		
 		return userId;
@@ -94,14 +93,14 @@ public class tcpClient {
 		loginData.put("username", username);
 		loginData.put("password", password);
 		
-		if(verbose){
+		if(Main.verbose){
 			System.out.println("TEST@registerUser: Sending hash = " );
 			System.out.println(loginData);
 			System.out.println("TEST@registerUser: Sending everything now.");
 		}
 		Com_object comIn = sendThroughSocket(userId, operationtype.register, loginData);
 		
-		if(verbose){
+		if(Main.verbose){
 			System.out.println("TEST@registerUser: Now getting success status");
 			System.out.println("TEST@registerUser: Got the hastable: " + comIn.elements);
 		}
@@ -109,7 +108,7 @@ public class tcpClient {
 		String status = comIn.elements.get("status");
 		iStatus = Integer.parseInt(status);
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@registerUser: Got iStatus = "+ iStatus);
 		
 		if(iStatus == 0)
@@ -124,17 +123,17 @@ public class tcpClient {
 		
 		identification.put("userId", Integer.toString(userId));
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@getWallet: Sending everything now.");
 		
 		Com_object comIn = sendThroughSocket(userId, operationtype.check_wallet, identification);
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@getWallet: Now getting wallet ammount");
 		
 		walletAmmount = comIn.elements.get("wallet");
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@getWallet: Got walletAmmount = "+ walletAmmount);
 		
 		return walletAmmount;
@@ -147,17 +146,17 @@ public class tcpClient {
 		moneyHash.put("userId", Integer.toString(userId));
 		moneyHash.put("userId", money);
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@addMoneyWallet: Sending everything now.");
 		
 		Com_object comIn = sendThroughSocket(userId, operationtype.add_wallet, moneyHash);
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@addMoneyWallet: Now getting wallet update confirmation");
 		
 		mStatus = Integer.parseInt(comIn.elements.get("money"));
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@addMoneyWallet: Got mStatus = "+ mStatus);
 		
 		if(mStatus == 0)
@@ -176,17 +175,17 @@ public class tcpClient {
 		projectHash.put("endDate", endDate);
 		projectHash.put("reqAmmount", reqAmmount);
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@createProject: Sending everything now.");
 		
 		Com_object comIn = sendThroughSocket(userId, operationtype.create_proj, projectHash);
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@createProject: Now getting project creation confirmation");
 		
 		status = Integer.parseInt(comIn.elements.get("projectStatus"));
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@createProject: Got status = "+ status);
 		
 		if(status == 0)
@@ -202,17 +201,17 @@ public class tcpClient {
 		tierHash.put("description", description);
 		tierHash.put("reqAmmount", reqAmmount);
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@createTier: Sending everything now.");
 		
 		Com_object comIn = sendThroughSocket(userId, operationtype.add_meta, tierHash);
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@createTier: Now getting tier creation confirmation");
 		
 		status = Integer.parseInt(comIn.elements.get("tierStatus"));
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@createTier: Got status = "+ status);
 		
 		if(status == 0)
@@ -229,7 +228,7 @@ public class tcpClient {
 		
 		Hashtable<String, String> menuHash = new Hashtable<String, String>();
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@getProjectsList: Sending everything now.");
 		
 		if(oldFlag){
@@ -244,7 +243,7 @@ public class tcpClient {
 			idListRaw = comIn.menuList.menuID;
 		}
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@getProjectsList: Got the menu options.");
 		
 		String[] strList = formatStringArray(strListRaw, startIndex);
@@ -304,17 +303,17 @@ public class tcpClient {
 		
 		requestHash.put("projId", projID);
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@getProjectData: Sending everything now.");
 		
 		Com_object comIn = sendThroughSocket(userId, operationtype.see_proj, requestHash);
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@getProjectData: Now getting project info");
 		
 		answerHash = comIn.elements;
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@getProjectData: Got answerHash = "+ answerHash);
 		
 		return answerHash;
@@ -326,17 +325,17 @@ public class tcpClient {
 		requestHash.put("userId", Integer.toString(userId));
 		requestHash.put("projId", projId);
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@checkAdmin: Sending everything now.");
 		
 		Com_object comIn = sendThroughSocket(userId, operationtype.check_admin, requestHash);
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@checkAdmin: Now getting admin status confirmation");
 		
 		int iAnswer = Integer.parseInt(comIn.elements.get("admin"));
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@checkAdmin: Got Admin status iAnswer = "+ iAnswer);
 		
 		if(iAnswer == 0)
@@ -350,19 +349,19 @@ public class tcpClient {
 		requestHash.put("userId", Integer.toString(userId));
 		requestHash.put("projID", projID);
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@nukeProject: Sending everything now.");
 		
 		Com_object comIn = sendThroughSocket(userId, operationtype.cancel_project, requestHash);
 		
-		if(verbose){
+		if(Main.verbose){
 			System.out.println("TEST@nukeProject: Now getting deletion confirmation");
 			System.out.println("TEST@nukeProject: Got the hash: "+comIn.elements);
 		}
 		
 		int iAnswer = Integer.parseInt(comIn.elements.get("delete"));
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@nukeProject: Got deletion status iAnswer = "+ iAnswer);
 		
 		if(iAnswer == 0)
@@ -378,14 +377,14 @@ public class tcpClient {
 		
 		Hashtable<String, String> menuHash = new Hashtable<String, String>();
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@getRewardsMenu: Sending everything now.");
 		
 		Com_object comIn = sendThroughSocket(0, operationtype.see_all_rewards, menuHash);
 		strListRaw = comIn.menuList.menuString;
 		idListRaw = comIn.menuList.menuID;
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@getRewardsMenu: Got the menu options.");
 		
 		String[] strList = formatStringArray(strListRaw, startIndex);
@@ -405,17 +404,17 @@ public class tcpClient {
 		requestHash.put("projId", projID);
 		requestHash.put("rewID", rewID);
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@getTierInfo: Sending everything now.");
 		
 		Com_object comIn = sendThroughSocket(userId, operationtype.see_reward, requestHash);
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@getTierInfo: Now getting tier info");
 		
 		answerHash = comIn.elements;
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@getTierInfo: Got answerHash = "+ answerHash);
 		
 		return answerHash;
@@ -429,17 +428,17 @@ public class tcpClient {
 		requestHash.put("projID", projID);
 		requestHash.put("rewID", rewID);
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@nukeTier: Sending everything now.");
 		
 		Com_object comIn = sendThroughSocket(userId, operationtype.remove_meta, requestHash);
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@nukeTier: Now getting deletion confirmation");
 		
 		int iAnswer = Integer.parseInt(comIn.elements.get("delete"));
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@nukeTier: Got deletion status iAnswer = "+ iAnswer);
 		
 		if(iAnswer == 0)
@@ -455,17 +454,17 @@ public class tcpClient {
 		requestHash.put("ammount", ammount);
 		requestHash.put("voteId", voteId);
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@addPledge: Sending everything now.");
 		
 		Com_object comIn = sendThroughSocket(userId, operationtype.pledge_project, requestHash);
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@addPledge: Now getting pledge confirmation");
 		
 		int iAnswer = Integer.parseInt(comIn.elements.get("pledgeConfirm"));
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@addPledge: Got pledgeConfirm status iAnswer = "+ iAnswer);
 		
 		if(iAnswer == 0)
@@ -480,17 +479,17 @@ public class tcpClient {
 		requestHash.put("rewID", rewID);
 		requestHash.put("ammount", ammount);
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@changePledge: Sending everything now.");
 		
 		Com_object comIn = sendThroughSocket(userId, operationtype.change_pledge, requestHash);
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@changePledge: Now getting confirmation of pledge change");
 		
 		int iAnswer = Integer.parseInt(comIn.elements.get("pledgeChangeConfirm"));
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@changePledge: Got pledgeConfirm status pledgeChangeConfirm = "+ iAnswer);
 		
 		if(iAnswer == 0)
@@ -504,17 +503,17 @@ public class tcpClient {
 		requestHash.put("userId", Integer.toString(userId));
 		requestHash.put("rewID", rewID);
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@removePledge: Sending everything now.");
 		
 		Com_object comIn = sendThroughSocket(userId, operationtype.remove_pledge, requestHash);
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@removePledge: Now getting confirmation of pledge remove");
 		
 		int iAnswer = Integer.parseInt(comIn.elements.get("pledgeRemoveConfirm"));
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@removePledge: Got pledgeConfirm status pledgeRemoveConfirm = "+ iAnswer);
 		
 		if(iAnswer == 0)
@@ -530,14 +529,14 @@ public class tcpClient {
 		
 		Hashtable<String, String> menuHash = new Hashtable<String, String>();
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@getVoteOptions: Sending everything now.");
 		
 		Com_object comIn = sendThroughSocket(0, operationtype.see_vote_options, menuHash);
 		strListRaw = comIn.menuList.menuString;
 		idListRaw = comIn.menuList.menuID;
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@getVoteOptions: Got the vote options.");
 		
 		String[] strList = formatStringArray(strListRaw, startIndex);
@@ -556,12 +555,12 @@ public class tcpClient {
 		
 		requestHash.put("userId", Integer.toString(userId));
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@getMyRewards: Sending everything now.");
 		
 		Com_object comIn = sendThroughSocket(userId, operationtype.see_my_reward, requestHash);
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@getMyRewards: Got my rewards list.");
 		
 		answer = comIn.menuList;
@@ -579,14 +578,14 @@ public class tcpClient {
 		
 		requestHash.put("projId", projId);
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@getMessageBoard: Sending everything now.");
 		
 		Com_object comIn = sendThroughSocket(0, operationtype.see_proj_responses, requestHash);
 		strListRaw = comIn.menuList.menuString;
 		idListRaw = comIn.menuList.menuID;
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@getMessageBoard: Got the message board.");
 		
 		String[] strList = formatStringArray(strListRaw, startIndex);
@@ -607,12 +606,12 @@ public class tcpClient {
 		
 		requestHash.put("notID", notID);
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@getNotification: Sending everything now.");
 		
 		Com_object comIn = sendThroughSocket(userId, operationtype.get_notification, requestHash);
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@getNotification: Now getting Message info");
 		
 		resultHash = comIn.elements;
@@ -628,17 +627,17 @@ public class tcpClient {
 		requestHash.put("title", title);
 		requestHash.put("descri", descri);
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@createNotification: Sending everything now.");
 		
 		Com_object comIn = sendThroughSocket(userId, operationtype.create_message, requestHash);
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@createNotification: Now getting message thread creation confirmation");
 		
 		int iAnswer = Integer.parseInt(comIn.elements.get("createMessage"));
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@createNotification: Got createMessage = "+ iAnswer);
 		
 		if(iAnswer == 0)
@@ -653,17 +652,17 @@ public class tcpClient {
 		requestHash.put("projId", projId);
 		requestHash.put("descri", descri);
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@answerNotification: Sending everything now.");
 		
 		Com_object comIn = sendThroughSocket(userId, operationtype.answer_message, requestHash);
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@answerNotification: Now getting reply message confirmation");
 		
 		int iAnswer = Integer.parseInt(comIn.elements.get("answerMessage"));
 		
-		if(verbose)
+		if(Main.verbose)
 			System.out.println("TEST@answerNotification: Got answerMessage = "+ iAnswer);
 		
 		if(iAnswer == 0)
