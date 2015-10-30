@@ -256,7 +256,7 @@ public class menuNavigation {
 		int projListSize;
 		int answer;
 		
-		projListObject = tcpClient.getMyProjectsList();
+		projListObject = tcpClient.getMyProjectsList(userId);
 		projListArray = projListObject.menuString;
 		projListIds = projListObject.menuID;
 		projListSize = projListArray.length;
