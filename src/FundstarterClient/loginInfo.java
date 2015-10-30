@@ -1,4 +1,4 @@
-package FundstarterClient;
+package fundstarterClient;
 
 import java.io.Serializable;
 

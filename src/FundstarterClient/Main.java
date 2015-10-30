@@ -1,4 +1,4 @@
-package FundstarterClient;
+package fundstarterClient;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import FundstarterClient.menuNavigation;
+import fundstarterClient.menuNavigation;
 
 
 public class Main {

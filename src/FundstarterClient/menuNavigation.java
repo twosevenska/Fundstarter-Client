@@ -1,10 +1,10 @@
-package FundstarterClient;
+package fundstarterClient;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-import FundstarterClient.inputCheck;
-import globalClasses.menu_list;
+import fundstarterClient.inputCheck;
+import globalClasses.Menu_list;
 
 public class menuNavigation {
 	
@@ -201,7 +201,7 @@ public class menuNavigation {
 	public static void showProjectsMenu(){
 		boolean oldFlag = false;
 		String[] ansArr = {"1","2"};
-		menu_list projListObject;
+		Menu_list projListObject;
 		String[] projListArray;
 		String[] projListIds;
  		String[] projListAnswer;
@@ -249,7 +249,7 @@ public class menuNavigation {
 	
 	public static void showMyProjectsMenu(){
 		boolean oldFlag = false;
-		menu_list projListObject;
+		Menu_list projListObject;
 		String[] projListArray;
 		String[] projListIds;
  		String[] projListAnswer;
@@ -350,7 +350,7 @@ public class menuNavigation {
 	}
 	
 	public static void listRewardsMenu(String projID){
-		menu_list rewListObject;
+		Menu_list rewListObject;
 		String[] rewList = null;
 		String[] rewListId = null;
 		String[] rewListAnswer = null;
@@ -504,7 +504,7 @@ public class menuNavigation {
 	}
 	
 	public static String listVoteOptions(String projID){
-		menu_list voteListObject;
+		Menu_list voteListObject;
 		String[] voteList = null;
 		String[] voteListId = null;
 		String[] voteListAnswer = null;
@@ -534,7 +534,7 @@ public class menuNavigation {
 	}
 	
 	public static void listNotificationsMenu(String projID){
-		menu_list notListObject;
+		Menu_list notListObject;
 		String[] notList = null;
 		String[] notListId = null;
 		String[] notListAnswer = null;

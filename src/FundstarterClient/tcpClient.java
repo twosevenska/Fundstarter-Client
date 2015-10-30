@@ -1,4 +1,4 @@
-package FundstarterClient;
+package fundstarterClient;
 
 import java.net.*;
 import java.util.Hashtable;
@@ -6,7 +6,7 @@ import java.io.*;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import globalClasses.Com_object;
-import globalClasses.menu_list;
+import globalClasses.Menu_list;
 import globalClasses.Com_object.operationtype;
 
 public class tcpClient {
@@ -220,8 +220,8 @@ public class tcpClient {
 	}
 	
 	
-	public static menu_list getProjectsList(boolean oldFlag){
-		menu_list answer = null;
+	public static Menu_list getProjectsList(boolean oldFlag){
+		Menu_list answer = null;
 		int startIndex = 1;
 		String[] strListRaw = null;
 		String[] idListRaw = null;
@@ -251,13 +251,13 @@ public class tcpClient {
 		String[] idList = formatIdArray(idListRaw, startIndex);
 		idList[0] = "Wubba lubba dub dub";
 		
-		answer = new menu_list(strList, idList);
+		answer = new Menu_list(strList, idList);
 		
 		return answer;
 	}
 	
-	public static menu_list getMyProjectsList(int userId){
-		menu_list answer = null;
+	public static Menu_list getMyProjectsList(int userId){
+		Menu_list answer = null;
 		int startIndex = 1;
 		String[] strListRaw = null;
 		String[] idListRaw = null;
@@ -281,7 +281,7 @@ public class tcpClient {
 		String[] idList = formatIdArray(idListRaw, startIndex);
 		idList[0] = "Shut the **** up about moonmen";
 		
-		answer = new menu_list(strList, idList);
+		answer = new Menu_list(strList, idList);
 		
 		return answer;
 	}
@@ -399,8 +399,8 @@ public class tcpClient {
 		return false;
 	}
 	
-	public static menu_list getRewardsMenu(String projID){
-		menu_list answer = null;
+	public static Menu_list getRewardsMenu(String projID){
+		Menu_list answer = null;
 		int startIndex = 1;
 		String[] strListRaw = null;
 		String[] idListRaw = null;
@@ -422,7 +422,7 @@ public class tcpClient {
 		String[] idList = formatIdArray(idListRaw, startIndex);
 		idList[0] = "WHATUP MY GLIP GLOPS";
 		
-		answer = new menu_list(strList, idList);
+		answer = new Menu_list(strList, idList);
 		
 		return answer;
 	}
@@ -551,8 +551,8 @@ public class tcpClient {
 		return false;
 	}
 	
-	public static menu_list getVoteOptions(String projID){
-		menu_list answer = null;
+	public static Menu_list getVoteOptions(String projID){
+		Menu_list answer = null;
 		int startIndex = 1;
 		String[] strListRaw = null;
 		String[] idListRaw = null;
@@ -574,13 +574,13 @@ public class tcpClient {
 		String[] idList = formatIdArray(idListRaw, startIndex);
 		idList[0] = "It's time to get schwifty.";
 		
-		answer = new menu_list(strList, idList);
+		answer = new Menu_list(strList, idList);
 		
 		return answer;
 	}
 	
-	public static menu_list getMyRewards(int userId){
-		menu_list answer = null;
+	public static Menu_list getMyRewards(int userId){
+		Menu_list answer = null;
 		Hashtable<String, String> requestHash = new Hashtable<String, String>();
 		
 		requestHash.put("userId", Integer.toString(userId));
@@ -598,8 +598,8 @@ public class tcpClient {
 		return answer;
 	}
 	
-	public static menu_list getMessageBoard(String projId){
-		menu_list answer = null;
+	public static Menu_list getMessageBoard(String projId){
+		Menu_list answer = null;
 		int startIndex = 2;
 		String[] strListRaw = null;
 		String[] idListRaw = null;
@@ -625,7 +625,7 @@ public class tcpClient {
 		idList[0] = "Let's just see where this goes...";
 		idList[1] = "Let's get RIGGITY WRECKED";
 		
-		answer = new menu_list(strList, idList);
+		answer = new Menu_list(strList, idList);
 		
 		return answer;
 	}

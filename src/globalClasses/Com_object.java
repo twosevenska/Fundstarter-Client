@@ -11,7 +11,7 @@ public class Com_object implements Serializable{
 	long idpackage;//package id, to avoid repeated packages
 	public operationtype op;//type of operation
 	public Hashtable<String, String> elements;//elements of the package
-	public menu_list menuList;//Optional, easy way to get the menu options
+	public Menu_list menuList;//Optional, easy way to get the menu options
     
 	public Com_object(int id, operationtype ope,Hashtable<String, String> ele)
 	{
