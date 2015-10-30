@@ -21,7 +21,7 @@ public class tcpClient {
 		
 		try {
 			// First open the socket
-			objsock = new Socket("localhost", serversocket);
+			objsock = new Socket(Main.serverAlphaAddress, serversocket);
 			if(Main.verbose)
 				System.out.println("SOCKET=" + objsock);
 			
