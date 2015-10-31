@@ -14,23 +14,50 @@ public class tcpClient {
 	static Socket objsock = null;
 	static ObjectOutputStream oos;
 	static ObjectInputStream ois;
+	static String currentServer = Main.serverAlphaAddress;
 	
-	public static void createTcpSocket() {
-		
+	public static boolean createTcpSocket() {
+		int tryCounter = 0;
+		int tryTotal = 8;
 		int serversocket = 6000;
+		int connectTimeout = 1000;
 		
-		try {
-			// First open the socket
-			objsock = new Socket(Main.serverAlphaAddress, serversocket);
-			if(Main.verbose)
-				System.out.println("SOCKET=" + objsock);
-			
-			// Now open the object streams
-			oos = new ObjectOutputStream(objsock.getOutputStream());
-			ois = new ObjectInputStream(objsock.getInputStream());
-		} catch (UnknownHostException e){System.out.println("Sock:" + e.getMessage());
-		} catch (IOException e) {System.out.println("IO:" + e.getMessage());
-		} 
+		while(tryCounter < tryTotal){
+			try {
+				// First open the socket
+				if(Main.verbose)
+					System.out.println("Connecting to address: " + currentServer);
+				//Warning: If something goes wrong, check HERE!!!!
+				Socket objsock = new Socket();
+				objsock.connect(new InetSocketAddress(currentServer, serversocket), connectTimeout);
+				if(Main.verbose)
+					System.out.println("SOCKET=" + objsock);
+				
+				// Now open the object streams
+				oos = new ObjectOutputStream(objsock.getOutputStream());
+				ois = new ObjectInputStream(objsock.getInputStream());
+				
+				return true;
+			} catch (UnknownHostException e){
+				if(Main.verbose){
+					System.out.println("Sock:" + e.getMessage());
+					e.printStackTrace();
+				}
+			} catch (IOException e) {
+				if(Main.verbose){
+					System.out.println("IO:" + e.getMessage());
+					//e.printStackTrace();
+					System.out.println("Changing address");
+				}
+				if(tryCounter % 2 == 1){
+					currentServer = Main.serverBetaAddress;
+					Main.serverBetaAddress = Main.serverAlphaAddress;
+					Main.serverAlphaAddress = currentServer;
+				}
+				tryCounter++;
+			}
+		}
+		return false;
 	}
 	
 	public static void closeTcpSocket(){
@@ -39,25 +66,92 @@ public class tcpClient {
 				objsock.close();
 			} catch (IOException e) {
 			    System.out.println("close:" + e.getMessage());
+			    e.printStackTrace();
 			}
 	}
 	
 	private static Com_object sendThroughSocket(int userId, operationtype operation, Hashtable<String, String> content){
+		boolean toSend = true;
+		int nullCounter = 0;
 		Com_object comIn = null;
 		// Let's create the object
 		Com_object comOut = new Com_object(userId, operation, content);
+		comOut.generateIdPackage(userId);
 		// And now send it
-		try{
-			oos.writeObject(comOut);
-			// Better clean the socket
-			oos.flush();
-			// And now read
-			comIn = (Com_object) ois.readObject();
-		} catch (IOException e) {System.out.println("IO:" + e.getMessage());
-		} catch (ClassNotFoundException e) {System.out.println("Wrong Object:" + e.getMessage());
+		while(toSend){
+			try{
+				oos.writeObject(comOut);
+				// Better clean the socket
+				oos.flush();
+				toSend = false;
+				// And now read
+				comIn = (Com_object) ois.readObject();
+				if(comIn == null){
+					if(nullCounter == 3)
+						exitProtocol();
+					toSend = true;
+					nullCounter++;
+				}
+			} catch (IOException e) {
+				if(Main.verbose){
+					System.out.println("IO:" + e.getMessage());
+					//e.printStackTrace();
+					System.out.println("Trying to reconnect");
+				}
+				if(!createTcpSocket())
+					exitProtocol();
+			} catch (ClassNotFoundException e) {
+				System.out.println("Wrong Object:" + e.getMessage());
+			}
 		}
-		
 		return comIn;
+	}
+	
+	private static Com_object sendThroughSocket(int userId, operationtype operation, Hashtable<String, String> content, Menu_list mList){
+		boolean toSend = true;
+		int nullCounter = 0;
+		Com_object comIn = null;
+		// Let's create the object
+		Com_object comOut = new Com_object(userId, operation, content, mList);
+		comOut.generateIdPackage(userId);
+		// And now send it
+		while(toSend){
+			try{
+				oos.writeObject(comOut);
+				// Better clean the socket
+				oos.flush();
+				toSend = false;
+				// And now read
+				comIn = (Com_object) ois.readObject();
+				if(comIn == null){
+					if(nullCounter == 3)
+						exitProtocol();
+					toSend = true;
+					nullCounter++;
+				}
+			} catch (IOException e) {
+				if(Main.verbose){
+					System.out.println("IO:" + e.getMessage());
+					//e.printStackTrace();
+					System.out.println("Trying to reconnect");
+				}
+				if(!createTcpSocket())
+					exitProtocol();
+			} catch (ClassNotFoundException e) {
+				System.out.println("Wrong Object:" + e.getMessage());
+			}
+		}
+		return comIn;
+	}
+	
+	private static void exitProtocol(){
+		System.out.println("We're sorry but we couldn't connect to the server.");
+		System.out.println("Closing the client now.");
+		if(Main.verbose){
+			System.out.println("Babe, it's not you... It's me.");
+		}
+		System.out.println("Please try again later.");
+		System.exit(0);
 	}
 	
 	public static int loginUser(String username, String password){
@@ -77,7 +171,7 @@ public class tcpClient {
 		if(Main.verbose)
 			System.out.println("TEST@loginUser: Now getting userID");
 		
-		userId = Integer.parseInt(comIn.elements.get("userid"));
+		userId = Integer.parseInt(comIn.elements.get("userId"));
 		
 		if(Main.verbose)
 			System.out.println("TEST@loginUser: Got userID = "+ userId);
@@ -165,9 +259,10 @@ public class tcpClient {
 	}
 	
 	public static boolean createProject(int userId, String projName, String description,
-										String endDate, String reqAmmount){
+										String endDate, String reqAmmount, String[] voteOptions){
 		int status = 0;
 		Hashtable<String, String> projectHash = new Hashtable<String, String>();
+		Menu_list request = new Menu_list(voteOptions, null);
 		
 		projectHash.put("userId", Integer.toString(userId));
 		projectHash.put("projName", projName);
@@ -178,7 +273,7 @@ public class tcpClient {
 		if(Main.verbose)
 			System.out.println("TEST@createProject: Sending everything now.");
 		
-		Com_object comIn = sendThroughSocket(userId, operationtype.create_proj, projectHash);
+		Com_object comIn = sendThroughSocket(userId, operationtype.create_proj, projectHash, request);
 		
 		if(Main.verbose)
 			System.out.println("TEST@createProject: Now getting project creation confirmation");
@@ -193,13 +288,14 @@ public class tcpClient {
 		return false;
 	}
 	
-	public static boolean createTier(int userId, String description, String reqAmmount){
+	public static boolean createTier(int userId, String description, String reqAmmount, String projId){
 		int status = 0;
 		Hashtable<String, String> tierHash = new Hashtable<String, String>();
 		
 		tierHash.put("userId", Integer.toString(userId));
 		tierHash.put("description", description);
 		tierHash.put("reqAmmount", reqAmmount);
+		tierHash.put("projId", projId);
 		
 		if(Main.verbose)
 			System.out.println("TEST@createTier: Sending everything now.");
@@ -407,6 +503,8 @@ public class tcpClient {
 		
 		Hashtable<String, String> menuHash = new Hashtable<String, String>();
 		
+		menuHash.put("projId", projID);
+		
 		if(Main.verbose)
 			System.out.println("TEST@getRewardsMenu: Sending everything now.");
 		
@@ -414,8 +512,12 @@ public class tcpClient {
 		strListRaw = comIn.menuList.menuString;
 		idListRaw = comIn.menuList.menuID;
 		
-		if(Main.verbose)
-			System.out.println("TEST@getRewardsMenu: Got the menu options.");
+		if(Main.verbose){
+			System.out.println("TEST@getRewardsMenu: Got the menu options: ");
+			for(String str: strListRaw){
+				System.out.println(str);
+			}
+		}
 		
 		String[] strList = formatStringArray(strListRaw, startIndex);
 		strList[0] = "\t0. Previous menu";
@@ -431,8 +533,9 @@ public class tcpClient {
 		Hashtable<String, String> requestHash = new Hashtable<String, String>();
 		Hashtable<String, String> answerHash;
 		
+		requestHash.put("userId", Integer.toString(userId));
 		requestHash.put("projId", projID);
-		requestHash.put("rewID", rewID);
+		requestHash.put("rewId", rewID);
 		
 		if(Main.verbose)
 			System.out.println("TEST@getTierInfo: Sending everything now.");
@@ -559,6 +662,8 @@ public class tcpClient {
 		
 		Hashtable<String, String> menuHash = new Hashtable<String, String>();
 		
+		menuHash.put("projId", projID);
+		
 		if(Main.verbose)
 			System.out.println("TEST@getVoteOptions: Sending everything now.");
 		
@@ -577,6 +682,42 @@ public class tcpClient {
 		answer = new Menu_list(strList, idList);
 		
 		return answer;
+	}
+	
+	public static String[] getVoteResults(String projID){
+		String[] titles = null;
+		String[] counts = null;
+		String[] result = null;
+		
+		Hashtable<String, String> menuHash = new Hashtable<String, String>();
+		
+		menuHash.put("projId", projID);
+		
+		if(Main.verbose)
+			System.out.println("TEST@getVoteOptions: Sending everything now.");
+		
+		Com_object comIn = sendThroughSocket(0, operationtype.see_vote_results, menuHash);
+		titles = comIn.menuList.menuString;
+		counts = comIn.menuList.menuID;
+		
+		if(Main.verbose)
+			System.out.println("TEST@getVoteOptions: Got the vote options.");
+		
+		result = parseVoteResults(titles, counts);
+		
+		return result;
+	}
+	
+	private static String[] parseVoteResults(String[] titles, String[] counts){
+		int total = titles.length;
+		int i = 0;
+		String[] strList = new String[total];
+		
+		for(i =0; i < total; i++){
+			strList[i] = titles[i].concat(" - ").concat(counts[i]);
+		}
+		
+		return strList;
 	}
 	
 	public static Menu_list getMyRewards(int userId){
@@ -630,11 +771,11 @@ public class tcpClient {
 		return answer;
 	}
 	
-	public static Hashtable< String, String> getNotification(int userId, String notID){
+	public static Hashtable< String, String> getNotification(int userId, String notId){
 		Hashtable<String, String> requestHash = new Hashtable<String, String>();
 		Hashtable<String, String> resultHash = null;
 		
-		requestHash.put("notID", notID);
+		requestHash.put("notId", notId);
 		
 		if(Main.verbose)
 			System.out.println("TEST@getNotification: Sending everything now.");
@@ -678,10 +819,11 @@ public class tcpClient {
 		return false;
 	}
 	
-	public static boolean answerNotification(int userId, String projId, String descri){
+	public static boolean answerNotification(int userId, String projId, String notId, String descri){
 		Hashtable<String, String> requestHash = new Hashtable<String, String>();
 		
 		requestHash.put("userId", Integer.toString(userId));
+		requestHash.put("notId", notId);
 		requestHash.put("projId", projId);
 		requestHash.put("descri", descri);
 		
@@ -726,4 +868,24 @@ public class tcpClient {
 		return false;
 	}
 	
+	public static String getProjectId(String projectTitle){
+		Hashtable<String, String> requestHash = new Hashtable<String, String>();
+		
+		requestHash.put("projectTitle", projectTitle);
+		
+		if(Main.verbose)
+			System.out.println("TEST@getProjectId: Sending everything now.");
+		
+		Com_object comIn = sendThroughSocket(0, operationtype.get_proj_id, requestHash);
+		
+		if(Main.verbose)
+			System.out.println("TEST@getProjectId: Now checking if the server found project: " + projectTitle);
+		
+		String answer = comIn.elements.get("projId");
+		
+		if(Main.verbose)
+			System.out.println("TEST@getProjectId: Got projId = " + answer);
+		
+		return answer;
+	}
 }

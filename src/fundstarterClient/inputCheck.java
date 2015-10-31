@@ -127,6 +127,25 @@ public class inputCheck {
 		return readval;
 	}
 	
+	public static int getHowManyVoteOptions(){
+		boolean valid = false;
+		int count = 0;
+		String readval = null;
+		
+		Scanner sc = new Scanner(System.in);
+		while(!valid){
+			readval = sc.nextLine();
+			if(checkIfInt(readval) && Integer.parseInt(readval) > 0 && Integer.parseInt(readval) != 1){
+				valid = true;
+			}else{
+				System.out.println("Sorry but the ammount of vote options " + readval + " is not valid.");
+				System.out.println("Please try again.");
+			}
+		}
+		//sc.close();
+		return count;
+	}
+	
 	private static boolean checkIfInt(String str){
 		int radix = 10;
 		Scanner sc = new Scanner(str.trim());
