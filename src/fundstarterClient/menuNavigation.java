@@ -24,8 +24,8 @@ public class menuNavigation {
 		System.out.println("\t1. Login/User Panel");
 		System.out.println("\t2. Register");
 		System.out.println("\t3. Show Projects");
-		System.out.println("\t4. Exit");
-		String[] ansArr = {"1","2","3","4"};
+		System.out.println("\t0. Exit");
+		String[] ansArr = {"1","2","3","0"};
 		int answer = inputCheck.getMenuAnswer(ansArr);
 		
 		switch (answer){
@@ -35,7 +35,7 @@ public class menuNavigation {
 					break;
 			case 3:	showProjectsMenu();
 					break;
-			case 4:	System.exit(1);
+			case 0:	System.exit(1);
 			break;
 			default:System.out.println("Err: Main Menu - Switch case not found for " + answer);
 					break;
