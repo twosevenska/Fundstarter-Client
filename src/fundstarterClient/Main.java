@@ -15,7 +15,7 @@ import fundstarterClient.menuNavigation;
  */
 public class Main {
 	
-	public static boolean verbose = true;
+	public static boolean verbose = false;
 	public static String serverAlphaAddress = "192.168.1.76";
 	public static String serverBetaAddress = "localhost";
 	public static String serverPort = "6000";
