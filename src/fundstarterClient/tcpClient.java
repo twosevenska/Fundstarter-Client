@@ -76,7 +76,9 @@ public class tcpClient {
 		Com_object comIn = null;
 		// Let's create the object
 		Com_object comOut = new Com_object(userId, operation, content);
-		comOut.generateIdPackage(userId);
+		if(Main.verbose){
+			System.out.println("Generated id: " + comOut.idpackage);
+		}
 		// And now send it
 		while(toSend){
 			try{
@@ -87,6 +89,8 @@ public class tcpClient {
 				// And now read
 				comIn = (Com_object) ois.readObject();
 				if(comIn == null){
+					if(Main.verbose)
+						System.out.println("Got null for request: " + operation);
 					if(nullCounter == 3)
 						exitProtocol();
 					toSend = true;
@@ -113,7 +117,9 @@ public class tcpClient {
 		Com_object comIn = null;
 		// Let's create the object
 		Com_object comOut = new Com_object(userId, operation, content, mList);
-		comOut.generateIdPackage(userId);
+		if(Main.verbose){
+			System.out.println("Generated id: " + comOut.idpackage);
+		}
 		// And now send it
 		while(toSend){
 			try{
@@ -124,6 +130,8 @@ public class tcpClient {
 				// And now read
 				comIn = (Com_object) ois.readObject();
 				if(comIn == null){
+					if(Main.verbose)
+						System.out.println("Got null for request: " + operation);
 					if(nullCounter == 3)
 						exitProtocol();
 					toSend = true;
@@ -225,7 +233,7 @@ public class tcpClient {
 		if(Main.verbose)
 			System.out.println("TEST@getWallet: Now getting wallet ammount");
 		
-		walletAmmount = comIn.elements.get("wallet");
+		walletAmmount = Integer.toString(Math.round(Float.parseFloat(comIn.elements.get("wallet"))));
 		
 		if(Main.verbose)
 			System.out.println("TEST@getWallet: Got walletAmmount = "+ walletAmmount);
@@ -579,11 +587,12 @@ public class tcpClient {
 		return false;
 	}
 	
-	public static boolean addPledge(int userId, String rewID, String ammount, String voteId){
+	public static boolean addPledge(int userId, String projId, String rewID, String ammount, String voteId){
 		Hashtable<String, String> requestHash = new Hashtable<String, String>();
 		
 		requestHash.put("userId", Integer.toString(userId));
-		requestHash.put("rewID", rewID);
+		requestHash.put("rewId", rewID);
+		requestHash.put("projId", projId);
 		requestHash.put("ammount", ammount);
 		requestHash.put("voteId", voteId);
 		
@@ -694,14 +703,14 @@ public class tcpClient {
 		menuHash.put("projId", projID);
 		
 		if(Main.verbose)
-			System.out.println("TEST@getVoteOptions: Sending everything now.");
+			System.out.println("TEST@getVoteResults: Sending everything now.");
 		
 		Com_object comIn = sendThroughSocket(0, operationtype.see_vote_results, menuHash);
 		titles = comIn.menuList.menuString;
 		counts = comIn.menuList.menuID;
 		
 		if(Main.verbose)
-			System.out.println("TEST@getVoteOptions: Got the vote options.");
+			System.out.println("TEST@getVoteResults: Got the vote options.");
 		
 		result = parseVoteResults(titles, counts);
 		
@@ -713,8 +722,24 @@ public class tcpClient {
 		int i = 0;
 		String[] strList = new String[total];
 		
-		for(i =0; i < total; i++){
-			strList[i] = titles[i].concat(" - ").concat(counts[i]);
+		if(Main.verbose){
+			System.out.println("TEST@parseVoteResults: Got a titles of size: " + total);
+			System.out.println("TEST@parseVoteResults: Got a counts of size: " + counts.length);
+			System.out.println("TEST@parseVoteResults: Got these on the counts array: " + counts.length);
+			for(String str: counts){
+				System.out.println(str);
+			}
+		}
+		
+		for(String str: titles){
+			strList[i] = counts[i] + " - " + str;
+			i++;
+		}
+		
+		if(Main.verbose){
+			System.out.println("TEST@parseVoteResults: Returning the strList:");
+			for(String str: strList)
+				System.out.println(str);
 		}
 		
 		return strList;
@@ -799,10 +824,12 @@ public class tcpClient {
 		requestHash.put("userId", Integer.toString(userId));
 		requestHash.put("projId", projId);
 		requestHash.put("title", title);
-		requestHash.put("descri", descri);
+		requestHash.put("description", descri);
 		
-		if(Main.verbose)
+		if(Main.verbose){
 			System.out.println("TEST@createNotification: Sending everything now.");
+			System.out.println("TEST@createNotification: Btw sending the following description: "+descri);
+		}
 		
 		Com_object comIn = sendThroughSocket(userId, operationtype.create_message, requestHash);
 		
@@ -825,7 +852,7 @@ public class tcpClient {
 		requestHash.put("userId", Integer.toString(userId));
 		requestHash.put("notId", notId);
 		requestHash.put("projId", projId);
-		requestHash.put("descri", descri);
+		requestHash.put("description", descri);
 		
 		if(Main.verbose)
 			System.out.println("TEST@answerNotification: Sending everything now.");
@@ -833,12 +860,12 @@ public class tcpClient {
 		Com_object comIn = sendThroughSocket(userId, operationtype.answer_message, requestHash);
 		
 		if(Main.verbose)
-			System.out.println("TEST@answerNotification: Now getting reply message confirmation");
+			System.out.println("TEST@answerNotification: Now getting reply message confirmation " + comIn.elements.get("answered"));
 		
-		int iAnswer = Integer.parseInt(comIn.elements.get("answerMessage"));
+		int iAnswer = Integer.parseInt(comIn.elements.get("answered"));
 		
 		if(Main.verbose)
-			System.out.println("TEST@answerNotification: Got answerMessage = "+ iAnswer);
+			System.out.println("TEST@answerNotification: Got answered = "+ iAnswer);
 		
 		if(iAnswer == 0)
 			return true;

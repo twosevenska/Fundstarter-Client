@@ -304,6 +304,9 @@ public class menuNavigation {
 		if(projectInfo.get("active").compareTo("0") == 0)
 			active = true;
 		
+		if(Main.verbose)
+			System.out.println("Test@showProjectOptionMenu: Got active status: " + active);
+		
 		if(active){
 			title = projectInfo.get("title");
 			progress = projectInfo.get("progress").concat("%");
@@ -316,15 +319,16 @@ public class menuNavigation {
 			title = projectInfo.get("title");
 			progress = projectInfo.get("progress");
 			description = projectInfo.get("description");
+			String str;
 			
 			if(Integer.parseInt(progress) < 100 ){
-				progress.concat(" - Funding Unsuccessful/Canceled");
+				str = "Funding Unsuccessful/Canceled with ";
 			}else{
-				progress.concat(" - Funded");
+				str = "Funded with ";
 			}
 				
 			System.out.println("Project - " + title);
-			System.out.println("Status: " + progress);
+			System.out.println("Status: " + str + progress);
 			System.out.println("Description: - " + description);
 		}
 		
@@ -480,6 +484,7 @@ public class menuNavigation {
 		String voteId = listVoteOptions(projID);
 		int currentWalletMoney = Integer.parseInt(tcpClient.checkWallet(userId));
 		System.out.println("Please choose the ammount you wish to add to this tier:");
+		
 		while(invalid){
 			pledgeDosh = inputCheck.getMoney(true);
 			int moneyResult = currentWalletMoney - Integer.parseInt(pledgeDosh);
@@ -487,6 +492,7 @@ public class menuNavigation {
 				invalid = false;
 			}else if(Integer.parseInt(pledgeDosh) == 0){
 				System.out.println("You chose 0, so we're taking you back to the previous menu.");
+				invalid = false;
 				showRewardMenu(projID, rewID);
 			}else if(moneyResult < 0){
 				System.out.println("You don't have enough money in your wallet.");
@@ -497,7 +503,8 @@ public class menuNavigation {
 				System.out.println("Sorry, but the ammount inserted is lower than the minimum ammount required for this tier.");
 			}
 		}
-		boolean result = tcpClient.addPledge(userId, rewID, pledgeDosh, voteId);
+		
+		boolean result = tcpClient.addPledge(userId, projID, rewID, pledgeDosh, voteId);
 		if(result){
 			System.out.println("Pledge successfull. Thank you!");
 		}else{
@@ -540,24 +547,26 @@ public class menuNavigation {
 		int voteListSize = 0;
 		int answer;
 		
-		System.out.println("Please choose the option you wish to vote on:");
-		
 		voteListObject = tcpClient.getVoteOptions(projID);
 		voteList = voteListObject.menuString;
 		voteListId = voteListObject.menuID;
 		voteListSize = voteList.length;
-		voteListAnswer = createAnswerList(voteListSize);
 		
-		for(String str : voteList)
-			System.out.println(str);
-		
-		answer = inputCheck.getMenuAnswer(voteListAnswer);
-		if(answer == 0){
-			showProjectOptionMenu(projID);
-		}else if(answer > 0 && answer <= voteListSize){
-			return voteListId[answer];
-		}else{
-			System.out.println("Err: Invalid option on vote selection menu.");
+		if(voteListSize != 1){
+			System.out.println("Please choose the option you wish to vote on:");
+			voteListAnswer = createAnswerList(voteListSize);
+			
+			for(String str : voteList)
+				System.out.println(str);
+			
+			answer = inputCheck.getMenuAnswer(voteListAnswer);
+			if(answer == 0){
+				showProjectOptionMenu(projID);
+			}else if(answer > 0 && answer <= voteListSize){
+				return voteListId[answer];
+			}else{
+				System.out.println("Err: Invalid option on vote selection menu.");
+			}
 		}
 		return "0";
 	}
@@ -640,7 +649,8 @@ public class menuNavigation {
 		
 		admin = tcpClient.checkAdmin(userId, projID);
 		
-		System.out.println("Title: \"" + title + "\" \nby " + user);
+		System.out.println("Title: " + title);
+		System.out.println("by " + user);
 		System.out.println("Message: " + description);
 		
 		if(answered)

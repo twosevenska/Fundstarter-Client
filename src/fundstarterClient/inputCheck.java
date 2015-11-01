@@ -51,7 +51,7 @@ public class inputCheck {
 		Scanner sc = new Scanner(System.in);
 		readval = sc.nextLine();
 		////sc.close();
-		return readval;
+		return readval.replace("'", "''");
 	}
 	
 	public static String getProjectDate(){
@@ -135,13 +135,17 @@ public class inputCheck {
 		Scanner sc = new Scanner(System.in);
 		while(!valid){
 			readval = sc.nextLine();
-			if(checkIfInt(readval) && Integer.parseInt(readval) > 0 && Integer.parseInt(readval) != 1){
+			if(checkIfInt(readval) && (Integer.parseInt(readval) > 1 || Integer.parseInt(readval) == 0)){
+				count = Integer.parseInt(readval);
 				valid = true;
 			}else{
 				System.out.println("Sorry but the ammount of vote options " + readval + " is not valid.");
 				System.out.println("Please try again.");
 			}
 		}
+		
+		if(Main.verbose)
+			System.out.println("Got the following ammount of vote options: " + count);
 		//sc.close();
 		return count;
 	}
