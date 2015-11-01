@@ -66,13 +66,11 @@ public class Main {
 			// Get the properties, almost like a hash table
 			String tempServer1 = prop.getProperty("server1");
 			String tempServer2 = prop.getProperty("server2");
-			String tempVerb = prop.getProperty("verbose");
+			boolean tempVerb = "true".equals(prop.getProperty("verbose"));
 			String tempPort = prop.getProperty("serverPort");
 			
-			if(tempServer1 == null && tempServer2 == null && tempVerb == null && tempPort == null)
-				valid = false;
-			
 			if(valid){
+
 				if(tempServer1 != null)
 					serverAlphaAddress = tempServer1;
 				
@@ -82,12 +80,26 @@ public class Main {
 				if(tempPort != null)
 					serverPort = tempPort;
 				
-				if(tempVerb == "true" && tempVerb != null)
+				if(tempVerb){
 					verbose = true;
+				}else{
+					verbose = false;
+				}
+			}
+			
+			if(verbose){
+				System.out.println("Printing contents of properties file.");
+				System.out.println("server1 " + tempServer1);
+				System.out.println("server2 " + tempServer2);
+				System.out.println("verbose " + tempVerb);
+				System.out.println("serverPort " + tempPort);
 			}
 
 		} catch (IOException ex) {
-			//ex.printStackTrace();
+			if(verbose){
+				System.out.println("Could not get properties file.");
+				ex.printStackTrace();
+			}
 		} finally {
 			if (input != null) {
 				try {
