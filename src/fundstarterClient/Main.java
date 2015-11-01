@@ -18,21 +18,22 @@ public class Main {
 	public static boolean verbose = false;
 	public static String serverAlphaAddress = "192.168.1.76";
 	public static String serverBetaAddress = "localhost";
-	public static String serverPort = "6000";
+	public static String serverAlphaPort = "6000";
+	public static String serverBetaPort = "7000";
 	
 	/**
 	 * Setups global environments and calls the main menu.
-	 * @param args The program can take either 0 or 4 arguments. They are in order: String serverAlphaAddress, String serverBetaAddress, String serverPortAddress and boolean verbose.
+	 * @param args The program can take either 0 or 5 arguments. They are in order: String serverAlphaAddress, String serverBetaAddress, String serverPortAddress and boolean verbose.
 	 */
 	public static void main(String[] args) {
 		boolean conSuc;
 		
 		if (args.length == 0){
 			loadProperties();
-		}else if(args.length == 4){
+		}else if(args.length == 5){
 			loadArguments(args);
 		}else{
-			System.out.println("Invalid number of arguments, got " + args.length + " expected 0 or 4" );
+			System.out.println("Invalid number of arguments, got " + args.length + " expected 0 or 5" );
 		}
 		
 		System.out.println("Connecting to server. Please wait.");
@@ -67,7 +68,8 @@ public class Main {
 			String tempServer1 = prop.getProperty("server1");
 			String tempServer2 = prop.getProperty("server2");
 			boolean tempVerb = "true".equals(prop.getProperty("verbose"));
-			String tempPort = prop.getProperty("serverPort");
+			String tempPort1 = prop.getProperty("serverPort1");
+			String tempPort2 = prop.getProperty("serverPort2");
 			
 			if(valid){
 
@@ -77,8 +79,11 @@ public class Main {
 				if(tempServer2 != null)
 					serverBetaAddress = tempServer2;
 				
-				if(tempPort != null)
-					serverPort = tempPort;
+				if(tempPort1 != null)
+					serverAlphaPort = tempPort1;
+				
+				if(tempPort2 != null)
+					serverBetaPort = tempPort2;
 				
 				if(tempVerb){
 					verbose = true;
@@ -92,7 +97,8 @@ public class Main {
 				System.out.println("server1 " + tempServer1);
 				System.out.println("server2 " + tempServer2);
 				System.out.println("verbose " + tempVerb);
-				System.out.println("serverPort " + tempPort);
+				System.out.println("serverPort1 " + tempPort1);
+				System.out.println("serverPort2 " + tempPort2);
 			}
 
 		} catch (IOException ex) {
@@ -119,14 +125,15 @@ public class Main {
 	 */
 	private static void loadArguments(String[] arguments){
 		serverAlphaAddress = arguments[0];
-		serverBetaAddress = arguments[1];
-		serverPort = arguments[2];
-		if(arguments[2].equalsIgnoreCase("true")){
+		serverBetaAddress = arguments[2];
+		serverAlphaPort = arguments[1];
+		serverBetaPort = arguments[3];
+		if(arguments[4].equalsIgnoreCase("true")){
 			verbose = true;
-		}else if(arguments[3].equalsIgnoreCase("false")){
+		}else if(arguments[4].equalsIgnoreCase("false")){
 			verbose = false;
 		}else{
-			System.out.println("Invalid fourth argument, got " + arguments[3] + " expected a boolean." );
+			System.out.println("Invalid fifth argument, got " + arguments[4] + " expected a boolean." );
 		}
 	}
 

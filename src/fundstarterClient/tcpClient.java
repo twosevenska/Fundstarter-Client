@@ -19,7 +19,7 @@ public class tcpClient {
 	public static boolean createTcpSocket() {
 		int tryCounter = 0;
 		int tryTotal = 8;
-		int serversocket = 6000;
+		int serversocket = Integer.parseInt(Main.serverAlphaPort);
 		int connectTimeout = 1000;
 		
 		while(tryCounter < tryTotal){
@@ -53,6 +53,10 @@ public class tcpClient {
 					currentServer = Main.serverBetaAddress;
 					Main.serverBetaAddress = Main.serverAlphaAddress;
 					Main.serverAlphaAddress = currentServer;
+					
+					serversocket = Integer.parseInt(Main.serverBetaPort);
+					Main.serverBetaPort = Main.serverAlphaPort;
+					Main.serverAlphaPort = Integer.toString(serversocket);
 				}
 				tryCounter++;
 			}
