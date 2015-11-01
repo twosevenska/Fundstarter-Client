@@ -28,6 +28,8 @@ public class Main {
 	public static void main(String[] args) {
 		boolean conSuc;
 		
+		//Runtime.getRuntime().addShutdownHook(new Thread()); // If we have time catch Ctrl+c and Ctrl+z
+		
 		if (args.length == 0){
 			loadProperties();
 		}else if(args.length == 5){

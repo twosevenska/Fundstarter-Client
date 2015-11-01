@@ -26,6 +26,7 @@ public class menuNavigation {
 		System.out.println("\t3. Show Projects");
 		System.out.println("\t0. Exit");
 		String[] ansArr = {"1","2","3","0"};
+		
 		int answer = inputCheck.getMenuAnswer(ansArr);
 		
 		switch (answer){
